@@ -65,6 +65,10 @@ body {
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
+  height: 100%;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
 }
 .kpi-card.clickable:hover {
   border-color: var(--accent);
@@ -706,12 +710,14 @@ function KpiCard({ label, value, sub, onClick, icon }) {
   return (
     <div className={"kpi-card" + (onClick ? " clickable" : "")} onClick={onClick}>
       <div className="accent-bar"></div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ fontSize: 12, color: 'var(--text-2)', letterSpacing: '0.02em' }}>{label}</div>
         {icon && <div style={{ fontSize: 18, opacity: 0.6 }}>{icon}</div>}
       </div>
-      <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--text-0)', lineHeight: 1.1 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 6 }}>{sub}</div>}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--text-0)', lineHeight: 1.1 }}>{value}</div>
+        {sub && <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 6 }}>{sub}</div>}
+      </div>
     </div>
   );
 }
@@ -1349,26 +1355,26 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
       {/* 人员概况 */}
       <div className="section" style={{ marginBottom: 16 }}>
         <div className="section-title">人员概况 <span className="badge">三家公司合计</span></div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 16, alignItems: 'stretch' }}>
           <KpiCard label="区域总人数" value={t.total} sub="三公司合计" />
           <KpiCard label="保安证持证人数" value={t.totalSec} sub={`持证率 ${fmtPct(t.totalSec / t.total)}`} />
           <KpiCard label="消控人数" value={t.totalFcStaff} sub="消控岗位 HC" />
           <KpiCard label="消控证持证人数" value={t.totalFcStaffWithCert} sub={`持证率 ${fmtPct(t.totalFcStaffWithCert / Math.max(1, t.totalFcStaff))}`} />
           <KpiCard label="双证人数" value={t.totalDouble} sub={`双证率 ${fmtPct(t.totalDouble / Math.max(1, t.fcStoreTotal))} · 基数 ${t.fcStoreTotal}`} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, alignItems: 'stretch' }}>
           <KpiCard label="大龄人员 (≥45岁)" value={t.totalOver45} sub={`占比 ${fmtPct(t.totalOver45 / t.total)}`} />
           <KpiCard label="离职人数" value={t.totalLeavers} sub="年至今累计" />
           <KpiCard label="无犯罪证明人数" value={t.totalNoCrime} sub={`覆盖率 ${fmtPct(t.totalNoCrime / t.total)}`} />
-          <div style={{ gridColumn: 'span 2' }}>
-            <div className="kpi-card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ gridColumn: 'span 2', display: 'flex' }}>
+            <div className="kpi-card" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               <div style={{ fontSize: 11, color: 'var(--text-2)', marginBottom: 4, letterSpacing: '0.02em' }}>持证率概览</div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-around', flex: 1 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <Donut data={certDonut} centerValue={fmtPct(t.totalSec / t.total)} centerLabel="保安证" height={200} innerRadius={50} outerRadius={75} />
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-around', flex: 1, minHeight: 0 }}>
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: 140 }}>
+                  <Donut data={certDonut} centerValue={fmtPct(t.totalSec / t.total)} centerLabel="保安证" height={140} innerRadius={40} outerRadius={58} />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <Donut data={doubleDonut} centerValue={fmtPct(t.totalDouble / Math.max(1, t.fcStoreTotal))} centerLabel="双证" height={200} innerRadius={50} outerRadius={75} />
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: 140 }}>
+                  <Donut data={doubleDonut} centerValue={fmtPct(t.totalDouble / Math.max(1, t.fcStoreTotal))} centerLabel="双证" height={140} innerRadius={40} outerRadius={58} />
                 </div>
               </div>
             </div>
