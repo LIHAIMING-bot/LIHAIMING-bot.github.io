@@ -66,7 +66,7 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   height: 100%;
-  min-height: 180px;
+  min-height: 224px;
   display: flex;
   flex-direction: column;
 }
@@ -722,20 +722,38 @@ function KpiCard({ label, value, sub, onClick, icon }) {
   );
 }
 
-function Donut({ data, centerLabel, centerValue, height = 220, innerRadius = 60, outerRadius = 88 }) {
+function Donut({ data, centerLabel, centerValue, size = 140, thickness = 16 }) {
+  // 手画 SVG 圆环：避免 ResponsiveContainer 嵌套 flex 高度计算问题
+  const r = (size - thickness) / 2;
+  const cx = size / 2, cy = size / 2;
+  const circumference = 2 * Math.PI * r;
+  const total = data.reduce((s, d) => s + (d.value || 0), 0);
+  let acc = 0;
   return (
-    <div style={{ position: 'relative', height }}>
-      <ResponsiveContainer>
-        <PieChart margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
-          <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%"
-               innerRadius={innerRadius} outerRadius={outerRadius} paddingAngle={2} stroke="#fff" strokeWidth={2}>
-            {data.map((d, i) => <Cell key={i} fill={d.color} />)}
-          </Pie>
-          <Tooltip contentStyle={{ background: 'white', border: '1px solid #e5e5ea', borderRadius: 8, fontSize: 12 }} itemStyle={{ color: '#1d1d1f' }} />
-        </PieChart>
-      </ResponsiveContainer>
+    <div style={{ position: 'relative', width: size, height: size + 24 }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {data.map((d, i) => {
+          const ratio = total > 0 ? d.value / total : 0;
+          const dash = ratio * circumference;
+          const gap = circumference - dash;
+          const offset = -acc * circumference;
+          acc += ratio;
+          return (
+            <circle
+              key={i}
+              cx={cx} cy={cy} r={r}
+              fill="none"
+              stroke={d.color}
+              strokeWidth={thickness}
+              strokeDasharray={`${dash} ${gap}`}
+              strokeDashoffset={offset}
+              transform={`rotate(-90 ${cx} ${cy})`}
+            />
+          );
+        })}
+      </svg>
       {centerValue !== undefined && (
-        <div className="donut-center">
+        <div className="donut-center" style={{ width: size, height: size, top: 0, left: 0, transform: 'translate(0,0)' }}>
           <div className="v">{centerValue}</div>
           <div className="l">{centerLabel}</div>
         </div>
@@ -1355,14 +1373,14 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
       {/* 人员概况 */}
       <div className="section" style={{ marginBottom: 16 }}>
         <div className="section-title">人员概况 <span className="badge">三家公司合计</span></div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 16, alignItems: 'stretch' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gridAutoRows: '224px', gap: 12, marginBottom: 16 }}>
           <KpiCard label="区域总人数" value={t.total} sub="三公司合计" />
           <KpiCard label="保安证持证人数" value={t.totalSec} sub={`持证率 ${fmtPct(t.totalSec / t.total)}`} />
           <KpiCard label="消控人数" value={t.totalFcStaff} sub="消控岗位 HC" />
           <KpiCard label="消控证持证人数" value={t.totalFcStaffWithCert} sub={`持证率 ${fmtPct(t.totalFcStaffWithCert / Math.max(1, t.totalFcStaff))}`} />
           <KpiCard label="双证人数" value={t.totalDouble} sub={`双证率 ${fmtPct(t.totalDouble / Math.max(1, t.fcStoreTotal))} · 基数 ${t.fcStoreTotal}`} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, alignItems: 'stretch' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gridAutoRows: '224px', gap: 12 }}>
           <KpiCard label="大龄人员 (≥45岁)" value={t.totalOver45} sub={`占比 ${fmtPct(t.totalOver45 / t.total)}`} />
           <KpiCard label="离职人数" value={t.totalLeavers} sub="年至今累计" />
           <KpiCard label="无犯罪证明人数" value={t.totalNoCrime} sub={`覆盖率 ${fmtPct(t.totalNoCrime / t.total)}`} />
@@ -1370,11 +1388,11 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
             <div className="kpi-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 180 }}>
               <div style={{ fontSize: 11, color: 'var(--text-2)', marginBottom: 4, letterSpacing: '0.02em' }}>持证率概览</div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-around', flex: 1, minHeight: 0 }}>
-                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: 160 }}>
-                  <Donut data={certDonut} centerValue={fmtPct(t.totalSec / t.total)} centerLabel="保安证" height={160} innerRadius={46} outerRadius={66} />
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Donut data={certDonut} centerValue={fmtPct(t.totalSec / t.total)} centerLabel="保安证" size={130} thickness={14} />
                 </div>
-                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: 160 }}>
-                  <Donut data={doubleDonut} centerValue={fmtPct(t.totalDouble / Math.max(1, t.fcStoreTotal))} centerLabel="双证" height={160} innerRadius={46} outerRadius={66} />
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Donut data={doubleDonut} centerValue={fmtPct(t.totalDouble / Math.max(1, t.fcStoreTotal))} centerLabel="双证" size={130} thickness={14} />
                 </div>
               </div>
             </div>
