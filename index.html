@@ -66,7 +66,7 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   height: 100%;
-  min-height: 130px;
+  min-height: 180px;
   display: flex;
   flex-direction: column;
 }
@@ -1367,14 +1367,14 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
           <KpiCard label="离职人数" value={t.totalLeavers} sub="年至今累计" />
           <KpiCard label="无犯罪证明人数" value={t.totalNoCrime} sub={`覆盖率 ${fmtPct(t.totalNoCrime / t.total)}`} />
           <div style={{ gridColumn: 'span 2', display: 'flex' }}>
-            <div className="kpi-card" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div className="kpi-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 180 }}>
               <div style={{ fontSize: 11, color: 'var(--text-2)', marginBottom: 4, letterSpacing: '0.02em' }}>持证率概览</div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-around', flex: 1, minHeight: 0 }}>
-                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: 140 }}>
-                  <Donut data={certDonut} centerValue={fmtPct(t.totalSec / t.total)} centerLabel="保安证" height={140} innerRadius={40} outerRadius={58} />
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: 160 }}>
+                  <Donut data={certDonut} centerValue={fmtPct(t.totalSec / t.total)} centerLabel="保安证" height={160} innerRadius={46} outerRadius={66} />
                 </div>
-                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: 140 }}>
-                  <Donut data={doubleDonut} centerValue={fmtPct(t.totalDouble / Math.max(1, t.fcStoreTotal))} centerLabel="双证" height={140} innerRadius={40} outerRadius={58} />
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: 160 }}>
+                  <Donut data={doubleDonut} centerValue={fmtPct(t.totalDouble / Math.max(1, t.fcStoreTotal))} centerLabel="双证" height={160} innerRadius={46} outerRadius={66} />
                 </div>
               </div>
             </div>
