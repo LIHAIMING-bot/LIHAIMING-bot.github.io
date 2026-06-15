@@ -269,6 +269,41 @@ input.search:focus, select.filter:focus { border-color: var(--accent); box-shado
   box-shadow: var(--shadow-sm);
 }
 .month-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+/* ===== Mobile / 平板适配 ===== */
+@media (max-width: 768px) {
+  body { padding: 0; }
+  .section { padding: 12px 12px; border-radius: 10px; }
+  .section-title { font-size: 14px; }
+  .kpi-card { padding: 12px 14px; }
+  .store-card { padding: 12px 14px; }
+  .store-card .stat-v { font-size: 14px; }
+  .kpi-grid-5, .kpi-grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+  table.data-table th, table.data-table td { padding: 6px 8px; font-size: 12px; }
+  .modal-overlay { padding: 0; align-items: stretch; }
+  .modal-content { max-width: 100vw !important; width: 100vw !important; max-height: 100vh !important; height: 100vh; border-radius: 0 !important; }
+  table.store-detail-table th, table.store-detail-table td { padding: 8px 6px; font-size: 12px; }
+  [style*="gridTemplateColumns: 'repeat(5, 1fr)'"] { grid-template-columns: repeat(2, 1fr) !important; }
+  [style*="gridTemplateColumns: 'repeat(3, 1fr)'"] { grid-template-columns: repeat(2, 1fr) !important; }
+  [style*="padding: '24px 32px'"] { padding: 10px 12px !important; }
+  [style*="padding: \"24px 32px\""] { padding: 10px 12px !important; }
+  .app-header { gap: 8px !important; }
+  .app-header h1 { font-size: 15px !important; white-space: normal; }
+  .app-header > div:first-child > div:first-child { gap: 8px; }
+  .app-header [style*="marginLeft: 40"] { margin-left: 36px !important; font-size: 11px; }
+  .app-header-actions { width: 100%; justify-content: flex-start; }
+  .month-pill { padding: 4px 8px !important; font-size: 12px; }
+  .month-pill select { font-size: 12px !important; }
+}
+@media (max-width: 420px) {
+  .kpi-grid-5, .kpi-grid-3 { grid-template-columns: 1fr 1fr !important; }
+  .store-card { padding: 10px 12px; }
+  .store-card .store-name { font-size: 12px; }
+  .donut-card-row { grid-column: span 2 !important; }
+  .donut-card-row .kpi-card { flex-direction: column; align-items: stretch !important; }
+  [style*="gridTemplateColumns: 'repeat(5, 1fr)'"] { grid-template-columns: 1fr 1fr !important; }
+  [style*="gridTemplateColumns: 'repeat(3, 1fr)'"] { grid-template-columns: 1fr 1fr !important; }
+}
 </style>
 </head>
 <body>
@@ -548,13 +583,28 @@ function aggregate(sheets, selectedMonth) {
   for (const r of roster) {
     const store = findKey(r, ['所在门店', '门店']);
     if (!store) continue;
-    if (!byStore[store]) byStore[store] = { name: store, total: 0, secCert: 0, doubleCert: 0, noFc: isNoFcStore(store), company: mapCompany(findKey(r, ['保安公司'])) };
+    if (!byStore[store]) byStore[store] = {
+      name: store, total: 0, secCert: 0, doubleCert: 0,
+      noFc: isNoFcStore(store),
+      company: mapCompany(findKey(r, ['保安公司'])),
+      people: []
+    };
     byStore[store].total += 1;
     if (hasCert(findKey(r, ['是否持有\n保安证', '是否持有保安证', '保安证']))) byStore[store].secCert += 1;
     if (hasCert(findKey(r, ['是否持有\n保安证', '是否持有保安证', '保安证'])) &&
         hasCert(findKey(r, ['是否持有\n消控证', '是否持有消控证', '消控证']))) {
       byStore[store].doubleCert += 1;
     }
+    byStore[store].people.push({
+      name: findKey(r, ['员工姓名', '姓名']) || '-',
+      gender: findKey(r, ['性别']) || '-',
+      age: findKey(r, ['年龄']) || '-',
+      role: findKey(r, ['岗位']) || '-',
+      joinDate: findKey(r, ['入职日期']) || '-',
+      secCert: findKey(r, ['是否持有\n保安证', '是否持有保安证', '保安证']) || '否',
+      fcCert: findKey(r, ['是否持有\n消控证', '是否持有消控证', '消控证']) || '否',
+      phone: findKey(r, ['手机号码', '手机号', '电话']) || '-',
+    });
   }
 
   // Filter sales by selected month
@@ -826,13 +876,14 @@ function ImagePreview({ src, alt }) {
   );
 }
 
-function StoreCard({ store }) {
+function StoreCard({ store, onClick }) {
   const certRate = store.total === 0 ? 0 : (store.secCert / store.total);
   const doubleRate = store.total === 0 ? 0 : (store.doubleCert / store.total);
   const color = COMPANY_COLORS[store.company] || '#888';
   const noFc = !!store.noFc;
   return (
-    <div className="store-card">
+    <div className="store-card" onClick={onClick} style={{ cursor: 'pointer' }}
+         title="点击查看门店花名册">
       <div>
         <div className="store-name">{store.name}</div>
         <div className="store-co" style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
@@ -871,6 +922,66 @@ function StoreCard({ store }) {
           <div className="bar-fill" style={{ width: `${Math.min(100, doubleRate * 100)}%`, background: '#e82127' }}></div>
         </div>
       </div>}
+      <div style={{ fontSize: 10, color: 'var(--text-3)', textAlign: 'right', marginTop: 2 }}>点击查看花名册 ›</div>
+    </div>
+  );
+}
+
+function StoreDetailModal({ store, onClose }) {
+  if (!store) return null;
+  const people = store.people || [];
+  const color = COMPANY_COLORS[store.company] || '#888';
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}
+           style={{ maxWidth: 760, width: '92vw', maxHeight: '88vh', padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-0)' }}>{store.name}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, display: 'inline-block' }}></span>
+              {store.company || '未分类'} · 共 {people.length} 人
+              {store.noFc && <span className="pill pill-gray" style={{ fontSize: 9 }}>无消控岗</span>}
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: 'var(--text-1)', fontSize: 13 }}>关闭</button>
+        </div>
+        <div style={{ overflow: 'auto', flex: 1, padding: '4px 0' }}>
+          <table className="store-detail-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+            <thead>
+              <tr style={{ background: 'var(--bg-soft)' }}>
+                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 500, color: 'var(--text-2)', fontSize: 11, position: 'sticky', top: 0, background: 'var(--bg-soft)' }}>姓名</th>
+                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 500, color: 'var(--text-2)', fontSize: 11, position: 'sticky', top: 0, background: 'var(--bg-soft)' }}>岗位</th>
+                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 500, color: 'var(--text-2)', fontSize: 11, position: 'sticky', top: 0, background: 'var(--bg-soft)' }}>电话</th>
+                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 500, color: 'var(--text-2)', fontSize: 11, position: 'sticky', top: 0, background: 'var(--bg-soft)' }}>保安证</th>
+                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 500, color: 'var(--text-2)', fontSize: 11, position: 'sticky', top: 0, background: 'var(--bg-soft)' }}>消控证</th>
+              </tr>
+            </thead>
+            <tbody>
+              {people.length === 0 && (
+                <tr><td colSpan="5" style={{ padding: 20, textAlign: 'center', color: 'var(--text-3)' }}>暂无人员数据</td></tr>
+              )}
+              {people.map((p, i) => (
+                <tr key={i} style={{ borderTop: '1px solid var(--border)' }}>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-0)', fontWeight: 500 }}>{p.name}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-1)' }}>{p.role}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-1)' }}>{p.phone}</td>
+                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                    {p.secCert === '是' || /是|有|初级|中级|高级/.test(p.secCert)
+                      ? <span className="pill" style={{ background: 'rgba(0,166,81,0.12)', color: '#00a651', fontSize: 10 }}>已持</span>
+                      : <span className="pill" style={{ background: 'rgba(232,33,39,0.12)', color: '#e82127', fontSize: 10 }}>未持</span>}
+                  </td>
+                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                    {p.fcCert === '否' || !p.fcCert
+                      ? <span style={{ color: 'var(--text-3)', fontSize: 12 }}>—</span>
+                      : <span className="pill" style={{ background: 'rgba(0,166,81,0.12)', color: '#00a651', fontSize: 10 }}>{p.fcCert}</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1196,7 +1307,7 @@ function RosterPage({ stats, sheets, onBack, headerExtra }) {
 
 function Header({ onBack, title, subtitle, children }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24, gap: 16 }}>
+    <div className="app-header" style={{ display: 'flex', alignItems: 'center', marginBottom: 24, gap: 16, flexWrap: 'wrap' }}>
       {onBack && (
         <button className="btn" onClick={onBack} style={{ padding: '8px 14px' }}>← 返回</button>
       )}
@@ -1207,7 +1318,7 @@ function Header({ onBack, title, subtitle, children }) {
         </div>
         {subtitle && <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 4, marginLeft: 40 }}>{subtitle}</div>}
       </div>
-      {children}
+      {children && <div className="app-header-actions" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>{children}</div>}
     </div>
   );
 }
@@ -1347,6 +1458,7 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
   })).filter(d => d.value > 0);
   const storeList = Object.values(stats.byStore)
     .sort((a, b) => b.total - a.total);
+  const [openStore, setOpenStore] = useState(null);
   const salesTrend = Object.entries(stats.sales.trendAll)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([m, v]) => ({ month: m, value: v }));
@@ -1371,18 +1483,18 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
       {/* 人员概况 */}
       <div className="section" style={{ marginBottom: 16 }}>
         <div className="section-title">人员概况 <span className="badge">三家公司合计</span></div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 16 }}>
+        <div className="kpi-grid-5" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 16 }}>
           <KpiCard label="区域总人数" value={t.total} sub="三公司合计" />
           <KpiCard label="保安证持证人数" value={t.totalSec} sub={`持证率 ${fmtPct(t.totalSec / t.total)}`} />
           <KpiCard label="消控人数" value={t.totalFcStaff} sub="消控岗位 HC" />
           <KpiCard label="消控证持证人数" value={t.totalFcStaffWithCert} sub={`持证率 ${fmtPct(t.totalFcStaffWithCert / Math.max(1, t.totalFcStaff))}`} />
           <KpiCard label="双证人数" value={t.totalDouble} sub={`双证率 ${fmtPct(t.totalDouble / Math.max(1, t.fcStoreTotal))} · 基数 ${t.fcStoreTotal}`} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+        <div className="kpi-grid-5" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
           <KpiCard label="大龄人员 (≥45岁)" value={t.totalOver45} sub={`占比 ${fmtPct(t.totalOver45 / t.total)}`} />
           <KpiCard label="离职人数" value={t.totalLeavers} sub="年至今累计" />
           <KpiCard label="无犯罪证明人数" value={t.totalNoCrime} sub={`覆盖率 ${fmtPct(t.totalNoCrime / t.total)}`} />
-          <div style={{ gridColumn: 'span 2' }}>
+          <div style={{ gridColumn: 'span 2' }} className="donut-card-row">
             <div className="kpi-card" style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 20px' }}>
               <div style={{ fontSize: 12, color: 'var(--text-2)', letterSpacing: '0.02em', flexShrink: 0 }}>持证率概览</div>
               <div style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-around' }}>
@@ -1397,7 +1509,7 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
       {/* 运营概况 */}
       <div className="section" style={{ marginBottom: 16 }}>
         <div className="section-title">运营概况 <span className="badge">{monthLabel}</span></div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+        <div className="kpi-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
           <KpiCard label="客诉总数量" value={stats.complaints.total} sub={stats.complaints.total > 0 ? '点击查看详情' : '周报暂无记录'}
             onClick={() => onNavigate('complaints')} />
           <KpiCard label="助力销售总数量" value={stats.sales.total} sub="点击查看详情" onClick={() => onNavigate('sales')} />
@@ -1429,7 +1541,7 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
               height={220} />
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 16 }}>
+        <div className="kpi-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 16 }}>
           {COMPANIES.map(c => (
             <div key={c} style={{ padding: 14, background: 'var(--bg-elevated)', borderRadius: 10, border: '1px solid var(--border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -1454,7 +1566,7 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
         <div className="section-title">门店人员分布 <span className="badge">{storeList.length} 家门店</span></div>
         {storeList.length === 0 ? <EmptyState /> : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
-            {storeList.map(s => <StoreCard key={s.name} store={s} />)}
+            {storeList.map(s => <StoreCard key={s.name} store={s} onClick={() => setOpenStore(s)} />)}
           </div>
         )}
       </div>
@@ -1483,6 +1595,7 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
       <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-3)', marginTop: 24, padding: 16, borderTop: '1px solid var(--border)' }}>
         华中区特斯拉项目安保管理面板 · Powered by MiniMax · 数据来源：安保信息汇总表
       </div>
+      {openStore && <StoreDetailModal store={openStore} onClose={() => setOpenStore(null)} />}
     </div>
   );
 }
