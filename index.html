@@ -8,7 +8,6 @@
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
 <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -477,67 +476,6 @@ function parseWeekly(wb) {
   return { weeks, events: weeks.flatMap(w => w.events) };
 }
 
-// 从 xlsx 文件（ArrayBuffer）提取所有图（col,row,rId -> dataUrl），关联到周报 events
-// 在 parseWorkbook 之后、setSheets 之前调用，把 imagesByAnchor 注入 sheets.weekly.anchors
-async function extractWeeklyImages(fileBuffer, sheets) {
-  if (typeof JSZip === 'undefined') return sheets;
-  try {
-    const zip = await JSZip.loadAsync(fileBuffer);
-    const drawingXml = await zip.file('xl/drawings/drawing1.xml')?.async('string');
-    const relsXml = await zip.file('xl/drawings/_rels/drawing1.xml.rels')?.async('string');
-    if (!drawingXml || !relsXml) return sheets;
-
-    // 解析 rels: rId -> image filename
-    const ridToFile = {};
-    const relRe = /<Relationship\s+Id="([^"]+)"[^>]*Target="([^"]+)"/g;
-    let m;
-    while ((m = relRe.exec(relsXml)) !== null) ridToFile[m[1]] = m[2].replace(/^.*?media\//, 'media/');
-
-    // 解析 drawing: <xdr:oneCellAnchor><xdr:from><xdr:col>C</xdr:col><xdr:row>R</xdr:row></xdr:from>...<a:blip r:embed="rIdN"/>...
-    const anchors = [];
-    const anchorRe = /<xdr:oneCellAnchor[\s\S]*?<xdr:col>(\d+)<\/xdr:col>[\s\S]*?<xdr:row>(\d+)<\/xdr:row>[\s\S]*?<a:blip[^>]*r:embed="([^"]+)"[\s\S]*?<\/xdr:oneCellAnchor>/g;
-    while ((m = anchorRe.exec(drawingXml)) !== null) {
-      anchors.push({ col: +m[1], row: +m[2], rId: m[3], file: ridToFile[m[3]] });
-    }
-    if (!anchors.length) return sheets;
-
-    // 加载所有图 -> dataUrl（base64）
-    const mimeOf = (n) => /\.png$/i.test(n) ? 'image/png' : /\.jpe?g$/i.test(n) ? 'image/jpeg' : 'image/png';
-    const dataUrls = {};
-    for (const a of anchors) {
-      if (!a.file || dataUrls[a.rId]) continue;
-      const blob = await zip.file('xl/drawings/' + a.file)?.async('uint8array');
-      if (!blob) continue;
-      // 拆 base64 字符串（每 76 字符换行）
-      const b64 = btoa(String.fromCharCode(...blob));
-      dataUrls[a.rId] = `data:${mimeOf(a.file)};base64,${b64}`;
-    }
-
-    // 把图片分派到事件：周报每 6 列 = 1 周，第 0 列是周标题，第 20/22/24 行是事件详情
-    // 假设同一 (weekStart, eventIdx) 的图片都来自 (col 落在该周列范围) AND (row 落在该 event 行)
-    const W = 6, EVENT_ROWS = [20, 22, 24];
-    sheets.weekly.anchors = anchors; // 保留锚点供页面调试
-    for (const w of sheets.weekly.weeks) {
-      // weekStart 列是 wk.col；事件图片 col 应在 [col, col+5] 内
-      const colStart = w._col;
-      const colEnd = colStart + 5;
-      for (let ei = 0; ei < w.events.length; ei++) {
-        const ev = w.events[ei];
-        // ei 顺序对应 EVENT_ROWS 行
-        const targetRow = EVENT_ROWS[Math.min(ei, EVENT_ROWS.length - 1)];
-        const imgs = anchors
-          .filter(a => a.col >= colStart && a.col <= colEnd && a.row === targetRow)
-          .map(a => dataUrls[a.rId])
-          .filter(Boolean);
-        ev.images = imgs;
-      }
-    }
-    sheets.weekly.allImages = Object.values(dataUrls); // 供页面统计
-  } catch (e) {
-    console.warn('extractWeeklyImages failed', e);
-  }
-  return sheets;
-}
 
 // Extract available months from sales/events
 function detectAvailableMonths(sheets) {
@@ -1308,7 +1246,6 @@ function EventsPage({ stats, onBack, headerExtra, selectedMonth }) {
 
 function WeeklyPage({ sheets, onBack, headerExtra, selectedMonth }) {
   const [openWeek, setOpenWeek] = useState(null);
-  const [lightbox, setLightbox] = useState(null);
   const weekly = sheets.weekly || { weeks: [] };
   const allEvents = weekly.events || [];
   // 按月过滤
@@ -1320,8 +1257,6 @@ function WeeklyPage({ sheets, onBack, headerExtra, selectedMonth }) {
     return list.slice().sort((a, b) => (b.dateLabel || '').localeCompare(a.dateLabel || ''));
   }, [weekly.weeks, selectedMonth]);
 
-  const totalImgs = (weekly.allImages || []).length;
-  const weeksWithImg = (weekly.weeks || []).filter(w => w.events.some(e => (e.images || []).length > 0)).length;
   const COMPLAINT_RE = /客诉|投诉/;
   const complaintStyle = (type) => COMPLAINT_RE.test(type)
     ? { background: 'rgba(232,33,39,0.12)', color: '#e82127' }
@@ -1329,14 +1264,13 @@ function WeeklyPage({ sheets, onBack, headerExtra, selectedMonth }) {
 
   return (
     <div style={{ minHeight: '100vh', padding: '24px 32px' }}>
-      <Header onBack={onBack} title="周报中心" subtitle={`${weeks.length} 周周报 · 共 ${allEvents.length} 条事件${totalImgs ? ' · 含 ' + totalImgs + ' 张现场图片' : ''}`}>{headerExtra}</Header>
+      <Header onBack={onBack} title="周报中心" subtitle={`${weeks.length} 周周报 · 共 ${allEvents.length} 条事件`}>{headerExtra}</Header>
 
       {weeks.length === 0 ? <EmptyState text={selectedMonth ? `所选月份 ${selectedMonth} 暂无周报` : '暂无周报数据'} /> : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {weeks.map((w, idx) => {
             const opened = openWeek === (w._col ?? idx);
             const evs = w.events || [];
-            const imgs = evs.reduce((s, e) => s + (e.images || []).length, 0);
             return (
               <div key={idx} className="section" style={{ marginBottom: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
@@ -1350,7 +1284,6 @@ function WeeklyPage({ sheets, onBack, headerExtra, selectedMonth }) {
                       <span>问题 <b style={{ color: '#e82127' }}>{w.issueCount}</b></span>
                       <span>已闭环 <b style={{ color: '#00a651' }}>{w.issueClosed}</b></span>
                       <span>事件 <b style={{ color: 'var(--text-0)' }}>{evs.length}</b></span>
-                      {imgs > 0 && <span style={{ color: '#0066cc' }}>📷 {imgs} 张</span>}
                     </div>
                   </div>
                   <div style={{ color: 'var(--text-3)', fontSize: 18 }}>{opened ? '▾' : '▸'}</div>
@@ -1368,15 +1301,6 @@ function WeeklyPage({ sheets, onBack, headerExtra, selectedMonth }) {
                               {e.date && <span style={{ fontSize: 11, color: 'var(--text-3)' }}>⏰ {e.date}</span>}
                             </div>
                             {e.desc && <div style={{ fontSize: 12, color: 'var(--text-1)', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{e.desc}</div>}
-                            {(e.images || []).length > 0 && (
-                              <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(96px, 1fr))', gap: 6 }}>
-                                {e.images.map((src, j) => (
-                                  <img key={j} src={src} alt="" className="image-thumb"
-                                       onClick={() => setLightbox(src)}
-                                       style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 6, cursor: 'zoom-in' }} />
-                                ))}
-                              </div>
-                            )}
                           </div>
                         ))}
                       </div>
@@ -1386,14 +1310,6 @@ function WeeklyPage({ sheets, onBack, headerExtra, selectedMonth }) {
               </div>
             );
           })}
-        </div>
-      )}
-
-      {lightbox && (
-        <div className="modal-overlay" onClick={() => setLightbox(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ background: 'transparent', border: 'none', padding: 0 }}>
-            <img src={lightbox} alt="" style={{ maxWidth: '92vw', maxHeight: '88vh', borderRadius: 8 }} />
-          </div>
         </div>
       )}
     </div>
@@ -1891,31 +1807,28 @@ function App() {
     return aggregate(sheets, selectedMonth);
   }, [sheets, selectedMonth]);
 
-  const handleFile = async (file) => {
+  const handleFile = (file) => {
     const reader = new FileReader();
-    reader.onload = async (e) => {
+    reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target.result);
         const wb = XLSX.read(data, { type: 'array', cellDates: false });
-        let newSheets = parseWorkbook(wb);
-        // 提取周报里的现场图片
-        newSheets = await extractWeeklyImages(e.target.result.slice(0), newSheets);
+        const newSheets = parseWorkbook(wb);
         setSheets(newSheets);
         const payload = {
           sheets: newSheets,
           source: file.name,
           uploadedAt: new Date().toISOString(),
         };
-        try { localStorage.setItem('tesla_dashboard_data', JSON.stringify(payload)); } catch (le) { console.warn('localStorage 存储失败（数据可能含图过大）：', le); }
+        localStorage.setItem('tesla_dashboard_data', JSON.stringify(payload));
         setDataSource(file.name);
         setSelectedMonth(null);
-        const imgCount = (newSheets.weekly && newSheets.weekly.allImages || []).length;
         alert(`✅ 已加载 ${file.name}\n\n` +
               `· 公司汇总：${(newSheets.company_summary || []).length} 行\n` +
               `· 花名册：${(newSheets.roster || []).length} 人\n` +
               `· 销售助力：${(newSheets.sales || []).length} 单\n` +
               `· 亮点事件：${(newSheets.events || []).length} 条\n` +
-              `· 周报：${(newSheets.weekly && newSheets.weekly.weeks || []).length} 周${imgCount ? ' · 含 ' + imgCount + ' 张现场图' : ''}`);
+              `· 周报：${(newSheets.weekly && newSheets.weekly.weeks || []).length} 周`);
       } catch (err) {
         alert('❌ 解析失败: ' + err.message);
         console.error(err);
@@ -1945,6 +1858,7 @@ function App() {
       {dataSource !== '内置示例数据' && (
         <button className="btn" onClick={resetData} title="恢复内置数据">↺ 重置</button>
       )}
+      <button className="btn" onClick={() => setPage('weekly')} title="查看周报明细">📋 周报</button>
       <button className="btn" onClick={() => setPage('roster')} title="查看花名册 (敏感)">👥 花名册</button>
       <button className="btn" onClick={() => { sessionStorage.removeItem('tesla_dashboard_authed'); setAuthed(false); }} title="退出登录">↩ 退出</button>
     </div>
