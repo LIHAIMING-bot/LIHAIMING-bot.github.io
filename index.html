@@ -1513,70 +1513,6 @@ function EmptyState() {
   );
 }
 
-// 本月优秀事件组件
-function EventHighlight({ data }) {
-  const [lightbox, setLightbox] = useState(null);
-  const events = (data && data.events) || [];
-  if (events.length === 0) {
-    return (
-      <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-3)', fontSize: 13 }}>
-        <div style={{ fontSize: 32, marginBottom: 8 }}>⭐</div>
-        暂无优秀事件
-      </div>
-    );
-  }
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {events.map(function(e, i) {
-        return (
-          <div key={i} style={{
-            background: 'var(--bg-1)', border: '1px solid var(--border)',
-            borderRadius: 8, padding: 16
-          }}>
-            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-0)', marginBottom: 6 }}>
-              ⭐ {e.title}
-            </div>
-            <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 10 }}>
-              📍 {e.store} · 🕐 {e.date}
-              {e.people ? ' · 👤 ' + e.people : ''}
-            </div>
-            <div style={{ fontSize: 13, color: 'var(--text-1)', lineHeight: 1.7, whiteSpace: 'pre-wrap', marginBottom: e.photos && e.photos.length ? 12 : 0 }}>
-              {e.description}
-            </div>
-            {e.photos && e.photos.length > 0 ? (
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {e.photos.map(function(p, j) {
-                  return (
-                    <img
-                      key={j}
-                      src={p}
-                      alt={'照片 ' + (j + 1)}
-                      className="image-thumb"
-                      style={{ width: 120, height: 120 }}
-                      onClick={function() { setLightbox(p); }}
-                    />
-                  );
-                })}
-              </div>
-            ) : null}
-          </div>
-        );
-      })}
-      {lightbox ? (
-        <div
-          onClick={function() { setLightbox(null); }}
-          style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 9999, cursor: 'zoom-out'
-          }}>
-          <img src={lightbox} alt="大图" style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: 8 }} />
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 function FilterBar({ search, setSearch, children }) {
   return (
     <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
@@ -1720,15 +1656,6 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
     { name: '未双证', value: Math.max(0, t.total - t.totalDouble), color: '#e5e5ea' },
   ];
 
-  // 加载优秀事件数据（来自 data/quiz.json，月底由用户手动更新）
-  const [eventData, setEventData] = useState({ events: [] });
-  useEffect(() => {
-    fetch('data/quiz.json?_=' + Date.now())
-      .then(function(r) { return r.ok ? r.json() : { events: [] }; })
-      .then(function(d) { setEventData(d || { events: [] }); })
-      .catch(function() { setEventData({ events: [] }); });
-  }, []);
-
   // Month display label
   const monthLabel = `${selectedMonth} 整月数据汇总`;
 
@@ -1847,12 +1774,6 @@ function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, avai
       <div className="section" style={{ marginBottom: 16 }}>
         <div className="section-title">月度对比 · 例外项 <span className="badge">本月 vs 月初（来自周报）</span></div>
         <MonthlyDiff weeks={stats.weekly ? stats.weekly.weeks : []} selectedMonth={selectedMonth} />
-      </div>
-
-      {/* 本月优秀事件 */}
-      <div className="section" style={{ marginBottom: 16 }}>
-        <div className="section-title">⭐ 本月优秀事件 <span className="badge">队员好人好事 / 服务案例</span></div>
-        <EventHighlight data={eventData} />
       </div>
 
       <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-3)', marginTop: 24, padding: 16, borderTop: '1px solid var(--border)' }}>
