@@ -4,13 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>华中区特斯拉项目 · 安保管理面板</title>
-<script src="https://cdn.bootcdn.net/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
-<script crossorigin src="https://cdn.bootcdn.net/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script crossorigin src="https://cdn.bootcdn.net/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/recharts/2.8.0/Recharts.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/babel-standalone/7.22.5/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+<script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
 :root {
   --bg-page: #f5f5f7;
@@ -1849,23 +1850,7 @@ function downloadCloudHtml(sheets, source) {
 }
 
 function App() {
-  const [authed, setAuthed] = useState(true);
-  const [rosterUnlocked, setRosterUnlocked] = useState(sessionStorage.getItem('tesla_dashboard_roster') === '1');
-  const [showRosterPwd, setShowRosterPwd] = useState(false);
-  const [rosterPwd, setRosterPwd] = useState('');
-  const [rosterPwdErr, setRosterPwdErr] = useState('');
-  const tryRosterPwd = () => {
-    if (rosterPwd === 'admin') {
-      sessionStorage.setItem('tesla_dashboard_roster', '1');
-      setRosterUnlocked(true);
-      setShowRosterPwd(false);
-      setRosterPwd('');
-      setRosterPwdErr('');
-      setPage('roster');
-    } else {
-      setRosterPwdErr('å¯ç éè¯¯');
-    }
-  };
+  const [authed, setAuthed] = useState(() => sessionStorage.getItem('tesla_dashboard_authed') === '1');
   const [sheets, setSheets] = useState(INITIAL_DATA.sheets);
   const [page, setPage] = useState('home');
   const [dataSource, setDataSource] = useState('内置示例数据');
@@ -1960,8 +1945,8 @@ function App() {
       {dataSource !== '内置示例数据' && (
         <button className="btn" onClick={resetData} title="恢复内置数据">↺ 重置</button>
       )}
-      <button className="btn" onClick={() => { if (rosterUnlocked) setPage('roster'); else setShowRosterPwd(true); }} title="查看花名册 (敏感)">👥 花名册</button>
-      <button className="btn" onClick={() => { sessionStorage.removeItem('tesla_dashboard_roster'); setRosterUnlocked(false); }} title="退出登录">↩ 退出</button>
+      <button className="btn" onClick={() => setPage('roster')} title="查看花名册 (敏感)">👥 花名册</button>
+      <button className="btn" onClick={() => { sessionStorage.removeItem('tesla_dashboard_authed'); setAuthed(false); }} title="退出登录">↩ 退出</button>
     </div>
   );
 
@@ -1970,53 +1955,14 @@ function App() {
   else if (page === 'complaints') content = <ComplaintsPage stats={stats} onBack={() => setPage('home')} headerExtra={topBar} />;
   else if (page === 'sales') content = <SalesPage stats={stats} onBack={() => setPage('home')} headerExtra={topBar} selectedMonth={selectedMonth} />;
   else if (page === 'events') content = <EventsPage stats={stats} onBack={() => setPage('home')} headerExtra={topBar} selectedMonth={selectedMonth} />;
-  else if (page === 'roster') {
-    if (!rosterUnlocked) {
-      content = (
-        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: '#fff', border: '1px solid var(--border)', borderRadius: 16, padding: 40, textAlign: 'center', maxWidth: 400, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>{ð}</div>
-            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-0)', marginBottom: 6 }}>{è±ååå·²éå®}</div>
-            <div style={{ fontSize: 13, color: 'var(--text-2)', marginBottom: 20 }}>{è±ååå«éåææä¿¡æ¯ï¼éè¦è¾å¥å¯ç æ¥ç}</div>
-            <button className="btn btn-primary" onClick={() => setShowRosterPwd(true)} style={{ width: '100%', justifyContent: 'center', padding: '10px 16px' }}>
-              {ç¹å»è¾å¥å¯ç }
-            </button>
-          </div>
-        </div>
-      );
-    } else {
-      content = <RosterPage stats={stats} sheets={sheets} onBack={() => setPage('home')} headerExtra={topBar} />;
-    }
-  }
+  else if (page === 'roster') content = <RosterPage stats={stats} sheets={sheets} onBack={() => setPage('home')} headerExtra={topBar} />;
   else if (page === 'weekly') content = <WeeklyPage sheets={sheets} onBack={() => setPage('home')} headerExtra={topBar} selectedMonth={selectedMonth} />;
 
-  // auth 默认 true（不需要登录门），花名册单独加锁
+  if (!authed) return <LoginPage onLogin={() => setAuthed(true)} />;
 
   return (
     <>
       <input ref={fileInput} type="file" accept=".xlsx,.xls" style={{ display: 'none' }}
-      {showRosterPwd && (
-        <div className="modal-overlay" onClick={() => { setShowRosterPwd(false); setRosterPwd(''); setRosterPwdErr(''); }}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ padding: 24, maxWidth: 360, width: '90vw' }}>
-            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-0)', marginBottom: 16 }}>{ð è¾å¥è±ååå¯ç }</div>
-            <input
-              type="password"
-              className="search"
-              autoFocus
-              value={rosterPwd}
-              onChange={(e) => { setRosterPwd(e.target.value); setRosterPwdErr(''); }}
-              onKeyDown={(e) => { if (e.key === 'Enter') tryRosterPwd(); }}
-              placeholder={è¯·è¾å¥å¯ç }
-              style={{ width: '100%', padding: '10px 12px', marginBottom: rosterPwdErr ? 4 : 12 }}
-            />
-            {rosterPwdErr && <div style={{ fontSize: 12, color: 'var(--accent)', marginBottom: 8 }}>{rosterPwdErr}</div>}
-            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-              <button className="btn" onClick={() => { setShowRosterPwd(false); setRosterPwd(''); setRosterPwdErr(''); }} style={{ flex: 1, justifyContent: 'center' }}>{åæ¶}</button>
-              <button className="btn btn-primary" onClick={tryRosterPwd} style={{ flex: 1, justifyContent: 'center' }}>{ç¡®å®}</button>
-            </div>
-          </div>
-        </div>
-      )}
         onChange={(e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ''; }} />
       {showIntro && (
         <div className="modal-overlay" onClick={dismissIntro}>
