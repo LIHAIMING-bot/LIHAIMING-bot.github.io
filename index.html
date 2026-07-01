@@ -1,5 +1,2020 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>redirect</title>
-<meta http-equiv="refresh" content="0;url=./home.html">
-<link rel="canonical" href="./home.html">
-</head><body>Redirecting to <a href="./home.html">home.html</a>...</body></html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<!-- rebuild 1782723443 -->
+<!-- 1782723295 -->
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>华中区特斯拉项目 · 安保管理面板</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+<script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+:root {
+  --bg-page: #f5f5f7;
+  --bg-card: #ffffff;
+  --bg-elevated: #fafafa;
+  --bg-soft: #f0f0f3;
+  --border: #e5e5ea;
+  --border-strong: #d8d8dd;
+  --text-0: #1d1d1f;
+  --text-1: #2c2c2e;
+  --text-2: #6e6e73;
+  --text-3: #98989d;
+  --accent: #e82127;
+  --accent-hover: #c91b21;
+  --accent-soft: #fff1f1;
+  --ok: #00875a;
+  --ok-soft: #e3fcef;
+  --warn: #b45309;
+  --warn-soft: #fef3c7;
+  --info: #0066cc;
+  --info-soft: #e6f0fb;
+  --purple: #6e3ff3;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg-page);
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "tnum";
+  letter-spacing: 0.01em;
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d8d8dd; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #b8b8bd; }
+.recharts-cartesian-axis-tick-value { fill: var(--text-2) !important; font-size: 11px; }
+.recharts-legend-item-text { color: var(--text-1) !important; font-size: 12px; }
+.recharts-tooltip-wrapper { outline: none; }
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.kpi-card.clickable:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(232, 33, 39, 0.12);
+  cursor: pointer;
+}
+.kpi-card.clickable { cursor: pointer; }
+.kpi-card .accent-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow-sm);
+}
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-0);
+  margin: 0 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.02em;
+}
+.section-title::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+.section-title .badge {
+  font-size: 10px;
+  padding: 3px 10px;
+  background: var(--bg-soft);
+  color: var(--text-2);
+  border-radius: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-left: auto;
+}
+.btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-card);
+  color: var(--text-1);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+}
+.btn:hover { background: var(--bg-soft); border-color: var(--text-3); }
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 1px 3px rgba(232, 33, 39, 0.3);
+}
+.btn-primary:hover { background: var(--accent-hover); }
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+table.data-table th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--bg-soft);
+  color: var(--text-2);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0;
+}
+table.data-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-1);
+}
+table.data-table tr:hover td { background: var(--bg-elevated); }
+input.search, select.filter {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  color: var(--text-1);
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+}
+input.search:focus, select.filter:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,33,39,0.1); }
+.pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.pill-green { background: var(--ok-soft); color: var(--ok); }
+.pill-red { background: var(--accent-soft); color: var(--accent); }
+.pill-yellow { background: var(--warn-soft); color: var(--warn); }
+.pill-blue { background: var(--info-soft); color: var(--info); }
+.pill-gray { background: var(--bg-soft); color: var(--text-2); }
+.pill-purple { background: #f0ebff; color: var(--purple); }
+.donut-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.donut-center .v { font-size: 18px; font-weight: 600; color: var(--text-0); }
+.donut-center .l { font-size: 11px; color: var(--text-2); margin-top: 3px; }
+.recharts-default-tooltip { background: white !important; border: 1px solid var(--border) !important; }
+.recharts-tooltip-label { color: var(--text-0) !important; }
+.recharts-tooltip-item { color: var(--text-1) !important; }
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 40px;
+}
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+}
+.image-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+.image-thumb:hover { border-color: var(--accent); }
+.text-mute { color: var(--text-2); }
+.text-dim { color: var(--text-3); }
+
+/* Store card grid */
+.store-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.store-card:hover {
+  border-color: var(--text-3);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+.store-card .store-name { font-size: 13px; font-weight: 600; color: var(--text-0); }
+.store-card .store-co { font-size: 10px; color: var(--text-2); }
+.store-card .store-stats { display: flex; gap: 16px; }
+.store-card .stat { display: flex; flex-direction: column; }
+.store-card .stat-v { font-size: 16px; font-weight: 600; color: var(--text-0); }
+.store-card .stat-l { font-size: 10px; color: var(--text-3); }
+.store-card .bar-track { background: var(--bg-soft); border-radius: 4px; height: 6px; overflow: hidden; }
+.store-card .bar-fill { height: 100%; border-radius: 4px; }
+
+.month-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-1);
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+}
+.month-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+/* ===== Mobile / 平板适配 ===== */
+@media (max-width: 768px) {
+  body { padding: 0; }
+  .section { padding: 12px 12px; border-radius: 10px; }
+  .section-title { font-size: 14px; }
+  .kpi-card { padding: 12px 14px; }
+  .store-card { padding: 12px 14px; }
+  .store-card .stat-v { font-size: 14px; }
+  .kpi-grid-5, .kpi-grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+  table.data-table th, table.data-table td { padding: 6px 8px; font-size: 12px; }
+  .modal-overlay { padding: 0; align-items: stretch; }
+  .modal-content { max-width: 100vw !important; width: 100vw !important; max-height: 100vh !important; height: 100vh; border-radius: 0 !important; }
+  table.store-detail-table th, table.store-detail-table td { padding: 8px 6px; font-size: 12px; }
+  [style*="gridTemplateColumns: 'repeat(5, 1fr)'"] { grid-template-columns: repeat(2, 1fr) !important; }
+  [style*="gridTemplateColumns: 'repeat(3, 1fr)'"] { grid-template-columns: repeat(2, 1fr) !important; }
+  [style*="padding: '24px 32px'"] { padding: 10px 12px !important; }
+  [style*="padding: \"24px 32px\""] { padding: 10px 12px !important; }
+  .app-header { gap: 8px !important; }
+  .app-header h1 { font-size: 15px !important; white-space: normal; }
+  .app-header > div:first-child > div:first-child { gap: 8px; }
+  .app-header [style*="marginLeft: 40"] { margin-left: 36px !important; font-size: 11px; }
+  .app-header-actions { width: 100%; justify-content: flex-start; }
+  .month-pill { padding: 4px 8px !important; font-size: 12px; }
+  .month-pill select { font-size: 12px !important; }
+}
+@media (max-width: 420px) {
+  .kpi-grid-5, .kpi-grid-3 { grid-template-columns: 1fr 1fr !important; }
+  .store-card { padding: 10px 12px; }
+  .store-card .store-name { font-size: 12px; }
+  .donut-card-row { grid-column: span 2 !important; }
+  .donut-card-row .kpi-card { flex-direction: column; align-items: stretch !important; }
+  [style*="gridTemplateColumns: 'repeat(5, 1fr)'"] { grid-template-columns: 1fr 1fr !important; }
+  [style*="gridTemplateColumns: 'repeat(3, 1fr)'"] { grid-template-columns: 1fr 1fr !important; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="__DATA__" style="display:none">{"meta": {"source": "华中区安保管理信息汇总.xlsx", "companies": ["道威", "瑞慕", "赛夫"], "generated_at": "2026-06-11T07:54:58"}, "sheets": {"company_summary": [{"保安公司": "道威", "主管": "李海鸣", "离职率": "0.1", "离职人数": "1", "年至今离职率（每月累加）": "0.1", "年至今离职人数": "1", "安保证持证率": "1", "安保证持证人数": "11", "消控岗人数（HC)": "2", "消控岗持证率": "1", "消控证持证人数": "2", "消控人员持安保证人数": "2", "消控人员持双证（安保证&消控证）占比": "0.14", "持无犯罪记证明人员": "14", "区域": "华中区", "省份": "湖北", "城市": "武汉 宜昌 荆州", "20岁以下人数": "0", "20岁以下占比": "0", "20-45人数": "11", "20-45占比": "0.7857", "45岁以上人数": "3", "45岁以上占比": "0.2143", "人员总计": "14", "认可大龄人数": "3"}, {"保安公司": "瑞慕", "主管": "", "离职率": "", "离职人数": "", "年至今离职率（每月累加）": "", "年至今离职人数": "", "安保证持证率": "", "安保证持证人数": "", "消控岗人数（HC)": "", "消控岗持证率": "", "消控证持证人数": "", "消控人员持安保证人数": "", "消控人员持双证（安保证&消控证）占比": "", "持无犯罪记证明人员": "", "区域": "", "省份": "", "城市": "", "20岁以下人数": "", "20岁以下占比": "", "20-45人数": "", "20-45占比": "", "45岁以上人数": "", "45岁以上占比": "", "人员总计": "", "认可大龄人数": ""}, {"保安公司": "赛夫", "主管": "", "离职率": "", "离职人数": "", "年至今离职率（每月累加）": "", "年至今离职人数": "", "安保证持证率": "", "安保证持证人数": "", "消控岗人数（HC)": "", "消控岗持证率": "", "消控证持证人数": "", "消控人员持安保证人数": "", "消控人员持双证（安保证&消控证）占比": "", "持无犯罪记证明人员": "", "区域": "", "省份": "", "城市": "", "20岁以下人数": "", "20岁以下占比": "", "20-45人数": "", "20-45占比": "", "45岁以上人数": "", "45岁以上占比": "", "人员总计": "", "认可大龄人数": ""}], "roster": [{"区域": "江西、岳阳、常德区域", "工作地": "南昌市", "员工姓名": "金银山", "保安公司": "上海道威保安服务有限公司", "入职日期": "2023-05-01", "岗位": "主管", "所在门店": "", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "15070056417", "性别": "男", "年龄": "29", "身份证号码": "", "户籍地址": "江西省南昌市新建区石埠乡金家自然村43号", "紧急联系人": "金丹丹", "联系电话": "17779103675"}, {"区域": "江西区域", "工作地": "南昌市", "员工姓名": "陈亨旺", "保安公司": "上海道威保安服务有限公司", "入职日期": "2026-03-01", "岗位": "消控员", "所在门店": "南昌恒望店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "15070083837", "性别": "男", "年龄": "32", "身份证号码": "", "户籍地址": "江西省南昌市新建区望城镇三联曹家自然村60号附2", "紧急联系人": "陈霞", "联系电话": "18296461823"}, {"区域": "江西区域", "工作地": "南昌市", "员工姓名": "程菁菁", "保安公司": "上海道威保安服务有限公司", "入职日期": "2023-08-16", "岗位": "保安员", "所在门店": "南昌恒望店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "136970007461", "性别": "男", "年龄": "41", "身份证号码": "", "户籍地址": "江西省南昌市新建区望城镇青西村", "紧急联系人": "饶丽", "联系电话": "13065150078"}, {"区域": "江西区域", "工作地": "南昌市", "员工姓名": "黄浩", "保安公司": "上海道威保安服务有限公司", "入职日期": "2024-03-04", "岗位": "主管", "所在门店": "南昌青山湖店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "13879116610", "性别": "男", "年龄": "24", "身份证号码": "", "户籍地址": "江西省南昌市南昌县蒋巷镇", "紧急联系人": "黄诚", "联系电话": "13672230232"}, {"区域": "江西区域", "工作地": "南昌市", "员工姓名": "罗天宇", "保安公司": "上海道威保安服务有限公司", "入职日期": "2025-02-04", "岗位": "消控员", "所在门店": "南昌青山湖店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "13879116610", "性别": "男", "年龄": "26", "身份证号码": "", "户籍地址": "江西省宜春市丰城市泉港镇潭埠罗家村19号", "紧急联系人": "罗天琪", "联系电话": "13237040326"}, {"区域": "江西区域", "工作地": "南昌市", "员工姓名": "朱文青", "保安公司": "上海道威保安服务有限公司", "入职日期": "2025-02-15", "岗位": "消控员", "所在门店": "南昌恒望店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "13627085145", "性别": "男", "年龄": "33", "身份证号码": "", "户籍地址": "江西省南昌市南昌县塘南镇田万村朱家自然村1号", "紧急联系人": "朱友芳", "联系电话": "15079148779"}, {"区域": "江西区域", "工作地": "南昌市", "员工姓名": "李接", "保安公司": "上海道威保安服务有限公司", "入职日期": "2023-07-24", "岗位": "消控员", "所在门店": "南昌青山湖店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "17007988887", "性别": "男", "年龄": "41", "身份证号码": "", "户籍地址": "江西省宜春市宜丰县石市镇楼下村10组88号", "紧急联系人": "卢晓青", "联系电话": "15216846118"}, {"区域": "江西区域", "工作地": "南昌市", "员工姓名": "韩学龙", "保安公司": "上海道威保安服务有限公司", "入职日期": "2023-11-29", "岗位": "保安员", "所在门店": "南昌经开店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "18570073639", "性别": "男", "年龄": "34", "身份证号码": "", "户籍地址": "甘肃省积石山保安族撒拉族东乡族自治县大河家镇大墩村", "紧急联系人": "韩海麦", "联系电话": "18054812147"}, {"区域": "江西区域", "工作地": "赣州市", "员工姓名": "刘明才", "保安公司": "上海道威保安服务有限公司", "入职日期": "2022-10-22", "岗位": "保安员", "所在门店": "赣州赣南店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "15083708706", "性别": "男", "年龄": "49", "身份证号码": "", "户籍地址": "江西省南康市龙岭镇围上村石头丘29号附1号", "紧急联系人": "刘香兰", "联系电话": "15879751246"}, {"区域": "江西区域", "工作地": "赣州市", "员工姓名": "刘兴林", "保安公司": "上海道威保安服务有限公司", "入职日期": "2025-03-18", "岗位": "保安员", "所在门店": "赣州赣南店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "13763968153", "性别": "男", "年龄": "38", "身份证号码": "", "户籍地址": "江西省赣州市章贡区潭口镇潭康路9号", "紧急联系人": "邹南凤", "联系电话": "14779779553"}, {"区域": "湖南区域", "工作地": "常德市", "员工姓名": "揭建喜", "保安公司": "上海道威保安服务有限公司", "入职日期": "2024-09-01", "岗位": "消控员", "所在门店": "常德德山店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "15576174556", "性别": "男", "年龄": "41", "身份证号码": "", "户籍地址": "湖南省常德市武陵区兴民街33号", "紧急联系人": "华女士", "联系电话": "13359640139"}, {"区域": "湖南区域", "工作地": "常德市", "员工姓名": "姚星武", "保安公司": "上海道威保安服务有限公司", "入职日期": "2024-09-01", "岗位": "消控员", "所在门店": "常德德山店", "是否持有\n保安证": "是", "是否持有\n消控证": "初级证", "手机号码": "15173619009", "性别": "男", "年龄": "42", "身份证号码": "", "户籍地址": "常德市桃源县热市镇郝仙坪居委会", "紧急联系人": "姚瑜元", "联系电话": "13549799386"}, {"区域": "湖南区域", "工作地": "岳阳市", "员工姓名": "方立军", "保安公司": "上海道威保安服务有限公司", "入职日期": "2024-12-15", "岗位": "保安员", "所在门店": "岳阳临港店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "13762086786", "性别": "男", "年龄": "48", "身份证号码": "", "户籍地址": "湖南省岳阳市岳阳楼区康王乡金山寺村方六组8号", "紧急联系人": "赵群", "联系电话": "17752837988"}, {"区域": "湖南区域", "工作地": "岳阳市", "员工姓名": "陈颖", "保安公司": "上海道威保安服务有限公司", "入职日期": "2024-09-20", "岗位": "消控员", "所在门店": "岳阳临港店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "19526186839", "性别": "男", "年龄": "41", "身份证号码": "", "户籍地址": "湖南省岳阳县步仙乡柘山村仕文村民组25号", "紧急联系人": "邹红霞", "联系电话": "13077158432"}, {"区域": "湖南长沙、株洲区域", "工作地": "长沙市", "员工姓名": "白润生", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2023-11-17", "岗位": "主管", "所在门店": "", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "15899958166", "性别": "男", "年龄": "46", "身份证号码": "", "户籍地址": "广东省乐昌市黄圃镇斗湾村委会内塘下岭组5号", "紧急联系人": "邓秀英", "联系电话": "18876146328"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "李红勇", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2022-08-01", "岗位": "保安员", "所在门店": "长沙河西店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "18565672956", "性别": "男", "年龄": "41", "身份证号码": "", "户籍地址": "河南省滑县桑村乡李金德村95号", "紧急联系人": "丁九英", "联系电话": "18436376609"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "曾劲松", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2025-11-17", "岗位": "消控员", "所在门店": "长沙河西店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "15576662497", "性别": "男", "年龄": "35", "身份证号码": "", "户籍地址": "湖南省平江县板江联校宿舍", "紧急联系人": "李兰遇", "联系电话": "13874045506"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "黄建军", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2020-11-14", "岗位": "保安员", "所在门店": "长沙河西店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "15773146190", "性别": "男", "年龄": "42", "身份证号码": "", "户籍地址": "湖南省南县明山头镇平福村第二村民小组24号", "紧急联系人": "郑红", "联系电话": "15073179938"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "周树其", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2020-11-17", "岗位": "保安员", "所在门店": "长沙天心店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "15802540607", "性别": "男", "年龄": "48", "身份证号码": "", "户籍地址": "长沙市天心区广厦新村B2栋501房", "紧急联系人": "韩蓉", "联系电话": "15802547167"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "胡海", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2021-10-07", "岗位": "保安员", "所在门店": "长沙青竹湖店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "13467597657", "性别": "男", "年龄": "53", "身份证号码": "", "户籍地址": "长沙市望城区丁字镇金云村楼塘坡组48号", "紧急联系人": "贺车红", "联系电话": "18874129066"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "魏丙年", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2021-09-15", "岗位": "保安员", "所在门店": "长沙青竹湖店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "13755197969", "性别": "男", "年龄": "53", "身份证号码": "", "户籍地址": "长沙市望城区桥驿镇禾丰村黄金山组147号", "紧急联系人": "谢稳", "联系电话": "13548955606"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "黄跃辉", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2025-11-15", "岗位": "消控员", "所在门店": "长沙星沙店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "15074942655", "性别": "男", "年龄": "25", "身份证号码": "", "户籍地址": "湖南省桃园县理公镇黄家坪村黄金湾组", "紧急联系人": "黄明宏", "联系电话": "18974238695"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "唐备战", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2022-06-20", "岗位": "消控员", "所在门店": "长沙星沙店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "15802605404", "性别": "男", "年龄": "54", "身份证号码": "", "户籍地址": "湖南省东安县大江口乡石桥村6组", "紧急联系人": "唐红英", "联系电话": "17708484028"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "洪治", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2024-07-01", "岗位": "消控员", "所在门店": "长沙星沙店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "18900729290", "性别": "男", "年龄": "38", "身份证号码": "", "户籍地址": "湖南省宁乡县东湖塘镇秦塘村高局塘组3号", "紧急联系人": "张治国", "联系电话": "15074937688"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "李志城", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2026-01-08", "岗位": "消控员", "所在门店": "长沙月亮岛店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "15973151080", "性别": "男", "年龄": "27", "身份证号码": "", "户籍地址": "湖南省宁乡市金洲镇关山社区泉塘片七组", "紧急联系人": "李龙军", "联系电话": "18229770248"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "袁国斌", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2024-10-19", "岗位": "消控员", "所在门店": "长沙月亮岛店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "18142626428", "性别": "男", "年龄": "53", "身份证号码": "", "户籍地址": "长沙市望城区大泽湖街道红建滨水铭城6栋201号", "紧急联系人": "田慧", "联系电话": "18107319084"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "黄丁文", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2025-12-26", "岗位": "保安员", "所在门店": "长沙月亮岛店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "‘182746550602", "性别": "男", "年龄": "23", "身份证号码": "", "户籍地址": "湖南省双牌县五星岭林场和平村015号", "紧急联系人": "黄国富", "联系电话": "18274650602"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "袁浩", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2022-12-27", "岗位": "保安员", "所在门店": "长沙开福店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "13080543498", "性别": "男", "年龄": "45", "身份证号码": "", "户籍地址": "长沙市开福区陈家湖14栋5门404房", "紧急联系人": "向春元", "联系电话": "13574169776"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "万红明", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2025-01-01", "岗位": "消控员", "所在门店": "长沙人民东路店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "15074900034", "性别": "男", "年龄": "49", "身份证号码": "", "户籍地址": "湖南省长沙县星沙镇中南汽车世界汽配城25栋313室", "紧急联系人": "陶屈元", "联系电话": "18711093933"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "罗豪", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2026-03-30", "岗位": "安保员", "所在门店": "长沙人民东路店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "15974203569", "性别": "男", "年龄": "38", "身份证号码": "", "户籍地址": "湖南省长沙县榔梨镇梨镇花园村新塘组496号", "紧急联系人": "谭婷婷", "联系电话": "18900712544"}, {"区域": "湖南区域", "工作地": "长沙市", "员工姓名": "刘广文", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2023-03-14", "岗位": "保安员", "所在门店": "株洲汽博园店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "18692881165", "性别": "男", "年龄": "47", "身份证号码": "", "户籍地址": "湖南省娄底市娄星区花山办事处观化居委会三组", "紧急联系人": "刘广城", "联系电话": "18596415588"}, {"区域": "湖南区域", "工作地": "株洲市", "员工姓名": "黄永满", "保安公司": "广东瑞慕保安服务有限公司", "入职日期": "2022-03-01", "岗位": "保安员", "所在门店": "株洲汽博园店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "15973765217", "性别": "男", "年龄": "54", "身份证号码": "", "户籍地址": "湖南省南县明山头镇永强村第十五村民小组", "紧急联系人": "何玉凤", "联系电话": "15973715510"}, {"区域": "湖北武汉、襄阳区域", "工作地": "武汉市", "员工姓名": "李温寒", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2022.7.20", "岗位": "主管", "所在门店": "", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "13807274967", "性别": "男", "年龄": "29", "身份证号码": "", "户籍地址": "湖北省宜城市朱市政府", "紧急联系人": "刘丽敏", "联系电话": "13972252921"}, {"区域": "湖北区域", "工作地": "襄阳市", "员工姓名": "金辉", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2024.7.5", "岗位": "消控员", "所在门店": "襄阳襄州店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "15997234183", "性别": "男", "年龄": "38", "身份证号码": "", "户籍地址": "襄阳市襄州区龙王镇龙兴村五组", "紧急联系人": "王梦蝶", "联系电话": "15997290750"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "吴久练", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2023.9.27", "岗位": "保安员", "所在门店": "武汉光谷店", "是否持有\n保安证": "否", "是否持有\n消控证": "否", "手机号码": "18064042037", "性别": "男", "年龄": "25", "身份证号码": "", "户籍地址": "湖北省武汉市黄陂区王家河街张家榨村", "紧急联系人": "陶玉红", "联系电话": "13294167102"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "徐仁贵", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2026.5.12", "岗位": "消控员", "所在门店": "武汉金桥店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "17362996759", "性别": "男", "年龄": "35", "身份证号码": "", "户籍地址": "湖北省孝感市孝昌县白沙镇东河村\n", "紧急联系人": "黄秋月", "联系电话": "15172350244"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "夏俭国", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2022.5.8", "岗位": "保安员", "所在门店": "武汉杨春湖店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "18171290602", "性别": "男", "年龄": "56", "身份证号码": "", "户籍地址": "河南省潢川县传流店乡前进村刘瓦房组", "紧急联系人": "孔德丽", "联系电话": "15347220626"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "王志鑫", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2021.5.10", "岗位": "保安员", "所在门店": "武汉蔡甸店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "13720113518", "性别": "男", "年龄": "56", "身份证号码": "", "户籍地址": "蔡甸广场1栋二单元2802", "紧急联系人": "明春娣", "联系电话": "13797821918"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "金铸", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2025.3.1", "岗位": "保安员", "所在门店": "武汉墨水湖店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "13581358340", "性别": "男", "年龄": "47", "身份证号码": "", "户籍地址": "湖北省荆门市东宝区长宁大道98号", "紧急联系人": "何建萍", "联系电话": "15907262399"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "聂晓东", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2025.3.1", "岗位": "保安员", "所在门店": "武汉蔡甸店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "15927289531", "性别": "男", "年龄": "28", "身份证号码": "", "户籍地址": "武汉市东西湖区走马岭办事处东西湖大道3960-501号", "紧急联系人": "王忠玉", "联系电话": "13986013980"}, {"区域": "湖北区域", "工作地": "襄阳市", "员工姓名": "王凤", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2025.4.8", "岗位": "消控员", "所在门店": "襄阳襄州店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "13697100180", "性别": "女", "年龄": "46", "身份证号码": "", "户籍地址": "湖北省宜城市汉江路5号", "紧急联系人": "谭华", "联系电话": "13617204788"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "吴立豪", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2021.10.20", "岗位": "保安员", "所在门店": "武汉金桥店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "13265208047", "性别": "男", "年龄": "23", "身份证号码": "", "户籍地址": "湖北省襄阳市南漳县城关镇舒向湾村三组", "紧急联系人": "王全生", "联系电话": "13986353041"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "张文科", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2025.6.5", "岗位": "保安员", "所在门店": "武汉金桥店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "13163375377", "性别": "男", "年龄": "48", "身份证号码": "", "户籍地址": "湖北省武穴市沿江大道东7-2号232室", "紧急联系人": "张丽", "联系电话": "13519899838"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "夏治文", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2022.5.8", "岗位": "保安员", "所在门店": "武汉杨春湖店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "18171093390", "性别": "男", "年龄": "33", "身份证号码": "", "户籍地址": "河南省信阳市潢川县传流店乡刘瓦房组", "紧急联系人": "夏孔曾", "联系电话": "15387000602"}, {"区域": "湖北区域", "工作地": "襄阳市", "员工姓名": "杨帮超", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2025.7.29", "岗位": "消控员", "所在门店": "襄阳襄州店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "18974967736", "性别": "男", "年龄": "40", "身份证号码": "", "户籍地址": "湖北省襄阳市襄州区伙牌镇汤岗材四组", "紧急联系人": "杨丽", "联系电话": "18271272298"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "潘天次", "保安公司": "上海赛夫保安服务有限公司", "入职日期": "2025.9.27", "岗位": "保安员", "所在门店": "武汉光谷店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "13764136126", "性别": "男", "年龄": "24", "身份证号码": "", "户籍地址": "河南省确山县留庄镇赵楼村潘庄西组", "紧急联系人": "潘卫云", "联系电话": "15876004275"}, {"区域": "湖北武汉，荆州，宜昌区域", "工作地": "武汉市", "员工姓名": "李海鸣", "保安公司": "上海道威保安服务有限公司", "入职日期": "2026.5.14", "岗位": "主管", "所在门店": "", "是否持有\n保安证": "是", "是否持有\n消控证": "初级证", "手机号码": "15623610702", "性别": "男", "年龄": "32", "身份证号码": "", "户籍地址": "武汉市江岸区青松路融创融公馆二期", "紧急联系人": "魏学梅", "联系电话": "13871138971"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "张金", "保安公司": "上海道威保安服务有限公司", "入职日期": "2025.3.1", "岗位": "保安员", "所在门店": "武汉经开店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "18907134882", "性别": "男", "年龄": "38", "身份证号码": "", "户籍地址": "武汉市黄陂区祁家湾街红卫村邓家湾30号", "紧急联系人": "张贤桂", "联系电话": "18907134819"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "万飞", "保安公司": "上海道威保安服务有限公司", "入职日期": "2023.8.6", "岗位": "保安员", "所在门店": "武汉经开店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "18672875815", "性别": "男", "年龄": "41", "身份证号码": "", "户籍地址": "湖北省天门市多祥镇多祥村2组18号", "紧急联系人": "万平权", "联系电话": "13035365786"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "周维", "保安公司": "上海道威保安服务有限公司", "入职日期": "2023.10.5", "岗位": "保安员", "所在门店": "武汉经开店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "15872767698", "性别": "男", "年龄": "49", "身份证号码": "", "户籍地址": "湖北省赤壁市蒲圻车站路天桥巷12号", "紧急联系人": "周斌", "联系电话": "15571497570"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "吴志全", "保安公司": "上海道威保安服务有限公司", "入职日期": "2025.9.27", "岗位": "保安员", "所在门店": "武汉东湖高新店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "15527757149", "性别": "男", "年龄": "42", "身份证号码": "", "户籍地址": "武汉市黄陂区罗汉寺街白塘村祠堂湾10号", "紧急联系人": "吴俊青", "联系电话": "17702787156"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "陈建伟", "保安公司": "上海道威保安服务有限公司", "入职日期": "2026.4.18", "岗位": "保安员", "所在门店": "武汉东湖高新店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "\n13217116122", "性别": "男", "年龄": "34", "身份证号码": "", "户籍地址": "湖北省鄂州市鄂城区古城南路涌泉小区\n", "紧急联系人": "曹东明", "联系电话": "15072199538"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "刘兴旺", "保安公司": "上海道威保安服务有限公司", "入职日期": "2023.10.5", "岗位": "保安员", "所在门店": "武汉东西湖店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "13207116133", "性别": "男", "年龄": "51", "身份证号码": "", "户籍地址": "湖北省武汉市东西湖区金山大道1187号207栋1单元3301室", "紧急联系人": "杨双", "联系电话": "13554147657"}, {"区域": "湖北区域", "工作地": "武汉市", "员工姓名": "刘勇祥", "保安公司": "上海道威保安服务有限公司", "入职日期": "2024.8.5", "岗位": "保安员", "所在门店": "武汉东西湖店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "18171292235", "性别": "男", "年龄": "50", "身份证号码": "", "户籍地址": "湖北省武汉市东西湖区吴家山街恒春里412号101室", "紧急联系人": "李金容", "联系电话": "17786418289"}, {"区域": "湖北区域", "工作地": "荆州市", "员工姓名": "万明", "保安公司": "上海道威保安服务有限公司", "入职日期": "2025.7.10", "岗位": "消控员", "所在门店": "湖北荆州店", "是否持有\n保安证": "是", "是否持有\n消控证": "中级证", "手机号码": "15650760778", "性别": "男", "年龄": "33", "身份证号码": "", "户籍地址": "湖北省江陵县资市镇先进村2组", "紧急联系人": "朱平", "联系电话": "13797418580"}, {"区域": "湖北区域", "工作地": "荆州市", "员工姓名": "肖凯文", "保安公司": "上海道威保安服务有限公司", "入职日期": "2025.7.15", "岗位": "保安员", "所在门店": "湖北荆州店", "是否持有\n保安证": "是", "是否持有\n消控证": "否", "手机号码": "15736134354", "性别": "男", "年龄": "27", "身份证号码": "", "户籍地址": "湖北省荆州市荆州区荆州中路82号", "紧急联系人": "黄菊花", "联系电话": "18727425090"}, {"区域": "湖北区域", "工作地": "宜昌市", "员工姓名": "熊蒸圆", "保安公司": "上海道威保安服务有限公司", "入职日期": "2025.9.10", "岗位": "保安员", "所在门店": "宜昌伍家岗店", "是否持有\n保安证": "否", "是否持有\n消控证": "否", "手机号码": "15007205897", "性别": "男", "年龄": "31", "身份证号码": "", "户籍地址": "湖北省宜昌市伍家岗区夷陵大道466号1栋3单元501室", "紧急联系人": "袁永携", "联系电话": "18972597100"}, {"区域": "湖北区域", "工作地": "宜昌市", "员工姓名": "叶华锋", "保安公司": "上海道威保安服务有限公司", "入职日期": "2025.9.18", "岗位": "保安员", "所在门店": "宜昌伍家岗店", "是否持有\n保安证": "否", "是否持有\n消控证": "否", "手机号码": "15872599140", "性别": "男", "年龄": "33", "身份证号码": "", "户籍地址": "湖北省宜昌市夷陵区鸦雀岭镇牧童村四组", "紧急联系人": "李凤玲", "联系电话": "15997633253"}], "sales": [{"区域 \nTerritory": "中区", "省份\n Province": "湖北", "城市 City": "武汉", "订单Order": "东西湖TC", "EHSS ": "Security", "推荐人姓名\n Name": "刘兴旺", "订单来源\n自然客流/朋友圈/友商/亲友": "自然客流", "订单/试驾 \nOrder/Test Drive": "订单Order", "助力日期\n 年/月/日/": "2026-06-07", "助力销售数量\nNumber": "1", "订单/试驾车型 \nModel": "Model Y", "销售订单号 Order Number": "RN812328389", "备注【所属保安公司】Remarks": "上海道威保安服务有限公司", "门店是否有驻场销售": "否", "销售\n人员姓名": "张凯平", "销售人员\n所属门店": "宜家荟聚体验店", "安保回访人姓名": "", "安保回访日期": "", "回访确认信息": "", "EHS复核人姓名": "", "EHS复核日期": ""}, {"区域 \nTerritory": "中区", "省份\n Province": "湖北", "城市 City": "武汉", "订单Order": "东西湖TC", "EHSS ": "Security", "推荐人姓名\n Name": "刘兴旺", "订单来源\n自然客流/朋友圈/友商/亲友": "自然客流", "订单/试驾 \nOrder/Test Drive": "订单Order", "助力日期\n 年/月/日/": "2026-06-07", "助力销售数量\nNumber": "1", "订单/试驾车型 \nModel": "Model Y", "销售订单号 Order Number": "RN812336576", "备注【所属保安公司】Remarks": "上海道威保安服务有限公司", "门店是否有驻场销售": "否", "销售\n人员姓名": "叶龙18186695422", "销售人员\n所属门店": "宜家荟聚体验店", "安保回访人姓名": "", "安保回访日期": "", "回访确认信息": "", "EHS复核人姓名": "", "EHS复核日期": ""}], "events": []}}</div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef } = React;
+const {
+  ResponsiveContainer, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area, AreaChart
+} = Recharts;
+
+const INITIAL_DATA = JSON.parse(document.getElementById('__DATA__').textContent);
+const COLORS = { daowei: '#e82127', ruimu: '#0066cc', saifu: '#6e3ff3' };
+const COMPANY_COLORS = { '道威': COLORS.daowei, '瑞慕': COLORS.ruimu, '赛夫': COLORS.saifu };
+const COMPANIES = ['道威', '瑞慕', '赛夫'];
+
+// 脱敏模式：true 时花名册页隐藏 PII 字段（身份证/手机/户籍/紧急联系人），
+// 顶部隐藏"👥 花名册"按钮，仅供云端汇报版使用。
+// 用法：导出云端版 HTML 时搜索替换为 PII_MODE = true 即可。
+const PII_MODE = false;
+const PII_HIDDEN_FIELDS = ['身份证号码', '身份证号', '身份证', '手机号码', '手机', '联系电话', '户籍地址', '紧急联系人', '紧急联系电话'];
+
+// 无消控岗门店：只用统计保安证持证率，不参与双证统计
+// 匹配规则：门店名/工作地包含以下关键字
+const NO_FC_STORE_KEYWORDS = ['武汉经开', '东西湖', '东湖高新', '宜昌'];
+const isNoFcStore = (name) => {
+  if (!name) return false;
+  const s = String(name);
+  return NO_FC_STORE_KEYWORDS.some(k => s.includes(k));
+};
+
+const n = (v) => {
+  if (v === null || v === undefined || v === '') return 0;
+  const num = Number(v);
+  return isNaN(num) ? 0 : num;
+};
+const pct = (a, b) => {
+  const aa = n(a), bb = n(b);
+  return bb === 0 ? 0 : (aa / bb) * 100;
+};
+const fmtPct = (v) => (n(v) * 100).toFixed(1) + '%';
+
+const normalizeKey = (k) => (k || '').replace(/[\s\n\r]/g, '').toLowerCase();
+const findKey = (obj, candidates) => {
+  const norm = {};
+  for (const k of Object.keys(obj || {})) norm[normalizeKey(k)] = k;
+  for (const c of candidates) {
+    const found = norm[normalizeKey(c)];
+    if (found && obj[found] !== undefined && obj[found] !== '') return obj[found];
+  }
+  return '';
+};
+const mapCompany = (name) => {
+  if (!name) return null;
+  const s = String(name);
+  if (s.includes('道威')) return '道威';
+  if (s.includes('瑞慕')) return '瑞慕';
+  if (s.includes('赛夫')) return '赛夫';
+  return null;
+};
+const hasCert = (v) => {
+  if (v === undefined || v === null) return false;
+  const s = String(v).trim();
+  return s === '是' || /^(初|中|高)级证/.test(s);
+};
+
+function parseWorkbook(wb) {
+  const sheets = {};
+  const allKeys = (sheetName) => {
+    const ws = wb.Sheets[sheetName];
+    if (!ws) return [];
+    return XLSX.utils.sheet_to_json(ws, { defval: '' });
+  };
+  sheets.company_summary = allKeys('月安保公司信息收集汇总');
+  sheets.roster = allKeys('月花名册详细信息');
+  sheets.sales = allKeys('销售助力统计');
+  sheets.events = allKeys('亮点事件');
+
+  // 解析周报 sheet —— 横向按"周"分块
+  // 标题在第 1 行：每 6 列 = 一周（标题/姓名/门店总数/总人数/巡店次数/巡店问题/巡店问题闭环/高亮/违规施工/车展/巡店问题/图片×N/本周重点工作/重点工作详情/图片×N/本周事件次数/本周事件详情/事件详情×N/图片/事件详情×N/图片/下周工作计划/下周计划详情）
+  sheets.weekly = parseWeekly(wb);
+  return sheets;
+}
+
+// 周报解析
+function parseWeekly(wb) {
+  const ws = wb.Sheets['周报'];
+  if (!ws) return { weeks: [], events: [] };
+  // 取出二维数组（含原始位置）
+  const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+  if (!aoa.length) return { weeks: [], events: [] };
+
+  // 找第一行的"周标题"列位置
+  const headerRow = aoa[0] || [];
+  const weekCols = []; // [{col, dateLabel}]
+  for (let c = 0; c < headerRow.length; c++) {
+    const v = String(headerRow[c] || '').trim();
+    if (/华中区主管周报/.test(v) || /周报/.test(v)) {
+      // 尝试从 v 中提取日期 (e.g. "华中区主管周报2026/6/4")
+      const m = v.match(/(\d{4})[\/\-年](\d{1,2})[\/\-月](\d{1,2})/);
+      let dateLabel = v;
+      if (m) dateLabel = `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+      weekCols.push({ col: c, dateLabel });
+    }
+  }
+  if (!weekCols.length) return { weeks: [], events: [] };
+
+  // 每 6 列是一周：标题(0)/姓名(1)/门店总数(2)/安保总人数(3)/巡店次数(4)/巡店问题(5)/巡店问题闭环(6)/高亮(7)/违规施工(8)/车展(9)/巡店问题详情(10)/图片N/重点工作(13)/详情(14)/图片N/本周事件次数(17)/本周事件详情(18)/...
+  // 实际数据上观察：第 1 行标题、第 3 行门店总数、第 4 行总人数、第 5 行巡店次数、第 6 行问题数、第 7 行问题闭环、第 11 行巡店问题详情、第 20 行本周事件次数、第 21/23/25 行事件详情
+  const rowMap = {
+    storeCount: 2,    // 门店总数
+    totalStaff: 3,    // 安保总人数
+    patrolCount: 4,   // 巡店次数
+    issueCount: 5,    // 巡店问题数
+    issueClosed: 6,   // 巡店问题闭环
+    patrolDetail: 10, // 巡店问题详情
+    eventCount: 19,   // 本周事件次数 (0-indexed = 20)
+    eventDetail: 20,  // 本周事件详情 (首次)
+  };
+  // 事件详情可能跨多行（21、23、25 三个块）
+  const eventDetailRows = [20, 22, 24];
+
+  const weeks = weekCols.map(({ col, dateLabel }) => {
+    const _col = col;
+    const gv = (r) => (aoa[r] && aoa[r][col] !== undefined ? String(aoa[r][col] || '').trim() : '');
+    const totalStaff = Number(gv(rowMap.totalStaff)) || 0;
+    const storeCount = Number(gv(rowMap.storeCount)) || 0;
+    const patrolCount = Number(gv(rowMap.patrolCount)) || 0;
+    const issueCount = Number(gv(rowMap.issueCount)) || 0;
+    const issueClosed = Number(gv(rowMap.issueClosed)) || 0;
+    // 事件详情提取
+    const events = [];
+    for (const r of eventDetailRows) {
+      const cell = gv(r);
+      if (!cell) continue;
+      // 单元格内可能用换行或 \n 分隔多个事件模板
+      // 模板格式："门店：\n事件类型：\n时间：\n事件原因及经过：\n事件结果：\n处理结果及后续行动："
+      const blocks = cell.split(/\n+/);
+      let cur = {};
+      for (const line of blocks) {
+        const t = line.trim();
+        if (!t) continue;
+        if (/^门店[:：]/.test(t) && !/事件类型/.test(t)) {
+          if (cur.store || cur.type || cur.date || cur.desc) events.push({ ...cur, weekDate: dateLabel });
+          cur = { store: t.replace(/^门店[:：]\s*/, '').trim() };
+        } else if (/^事件类型[:：]/.test(t)) {
+          cur.type = t.replace(/^事件类型[:：]\s*/, '').trim();
+        } else if (/^时间[:：]/.test(t)) {
+          cur.date = t.replace(/^时间[:：]\s*/, '').trim();
+        } else if (/^事件原因|^事件结果|^处理结果/.test(t)) {
+          cur.desc = (cur.desc ? cur.desc + ' / ' : '') + t;
+        } else if (cur.store && !cur.type) {
+          // 续行：合并到 store
+          cur.store += t;
+        } else if (cur.type && !cur.date) {
+          cur.date = t;
+        } else if (cur.desc) {
+          cur.desc += ' / ' + t;
+        } else {
+          // 可能是自由文本描述
+          cur.desc = (cur.desc ? cur.desc + ' / ' : '') + t;
+        }
+      }
+      if (cur.store || cur.type || cur.date || cur.desc) events.push({ ...cur, weekDate: dateLabel });
+    }
+    return { dateLabel, _col, totalStaff, storeCount, patrolCount, issueCount, issueClosed, events };
+  });
+
+  return { weeks, events: weeks.flatMap(w => w.events) };
+}
+
+// 从 xlsx 文件（ArrayBuffer）提取所有图（col,row,rId -> dataUrl），关联到周报 events
+// 在 parseWorkbook 之后、setSheets 之前调用，把 imagesByAnchor 注入 sheets.weekly.anchors
+async function extractWeeklyImages(fileBuffer, sheets) {
+  if (typeof JSZip === 'undefined') return sheets;
+  try {
+    const zip = await JSZip.loadAsync(fileBuffer);
+    const drawingXml = await zip.file('xl/drawings/drawing1.xml')?.async('string');
+    const relsXml = await zip.file('xl/drawings/_rels/drawing1.xml.rels')?.async('string');
+    if (!drawingXml || !relsXml) return sheets;
+
+    // 解析 rels: rId -> image filename
+    const ridToFile = {};
+    const relRe = /<Relationship\s+Id="([^"]+)"[^>]*Target="([^"]+)"/g;
+    let m;
+    while ((m = relRe.exec(relsXml)) !== null) ridToFile[m[1]] = m[2].replace(/^.*?media\//, 'media/');
+
+    // 解析 drawing: <xdr:oneCellAnchor><xdr:from><xdr:col>C</xdr:col><xdr:row>R</xdr:row></xdr:from>...<a:blip r:embed="rIdN"/>...
+    const anchors = [];
+    const anchorRe = /<xdr:oneCellAnchor[\s\S]*?<xdr:col>(\d+)<\/xdr:col>[\s\S]*?<xdr:row>(\d+)<\/xdr:row>[\s\S]*?<a:blip[^>]*r:embed="([^"]+)"[\s\S]*?<\/xdr:oneCellAnchor>/g;
+    while ((m = anchorRe.exec(drawingXml)) !== null) {
+      anchors.push({ col: +m[1], row: +m[2], rId: m[3], file: ridToFile[m[3]] });
+    }
+    if (!anchors.length) return sheets;
+
+    // 加载所有图 -> dataUrl（base64）
+    const mimeOf = (n) => /\.png$/i.test(n) ? 'image/png' : /\.jpe?g$/i.test(n) ? 'image/jpeg' : 'image/png';
+    const dataUrls = {};
+    for (const a of anchors) {
+      if (!a.file || dataUrls[a.rId]) continue;
+      const blob = await zip.file('xl/drawings/' + a.file)?.async('uint8array');
+      if (!blob) continue;
+      // 拆 base64 字符串（每 76 字符换行）
+      const b64 = btoa(String.fromCharCode(...blob));
+      dataUrls[a.rId] = `data:${mimeOf(a.file)};base64,${b64}`;
+    }
+
+    // 把图片分派到事件：周报每 6 列 = 1 周，第 0 列是周标题，第 20/22/24 行是事件详情
+    // 假设同一 (weekStart, eventIdx) 的图片都来自 (col 落在该周列范围) AND (row 落在该 event 行)
+    const W = 6, EVENT_ROWS = [20, 22, 24];
+    sheets.weekly.anchors = anchors; // 保留锚点供页面调试
+    for (const w of sheets.weekly.weeks) {
+      // weekStart 列是 wk.col；事件图片 col 应在 [col, col+5] 内
+      const colStart = w._col;
+      const colEnd = colStart + 5;
+      for (let ei = 0; ei < w.events.length; ei++) {
+        const ev = w.events[ei];
+        // ei 顺序对应 EVENT_ROWS 行
+        const targetRow = EVENT_ROWS[Math.min(ei, EVENT_ROWS.length - 1)];
+        const imgs = anchors
+          .filter(a => a.col >= colStart && a.col <= colEnd && a.row === targetRow)
+          .map(a => dataUrls[a.rId])
+          .filter(Boolean);
+        ev.images = imgs;
+      }
+    }
+    sheets.weekly.allImages = Object.values(dataUrls); // 供页面统计
+  } catch (e) {
+    console.warn('extractWeeklyImages failed', e);
+  }
+  return sheets;
+}
+
+// Extract available months from sales/events
+function detectAvailableMonths(sheets) {
+  const months = new Set();
+  const now = new Date();
+  // Always include the current month
+  months.add(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
+  for (const r of (sheets.sales || [])) {
+    const d = findKey(r, ['助力日期\n 年/月/日/', '助力日期', '日期']);
+    if (d) {
+      const dt = new Date(d);
+      if (!isNaN(dt)) months.add(`${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`);
+    }
+  }
+  for (const r of (sheets.events || [])) {
+    const d = findKey(r, ['时间']);
+    if (d) {
+      const dt = new Date(d);
+      if (!isNaN(dt)) months.add(`${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`);
+    }
+  }
+  return Array.from(months).sort();
+}
+
+function aggregate(sheets, selectedMonth) {
+  const companyRows = sheets.company_summary || [];
+  const roster = sheets.roster || [];
+  const sales = sheets.sales || [];
+  const events = sheets.events || [];
+
+  const byCompany = {};
+  COMPANIES.forEach(c => byCompany[c] = {
+    total: 0, secCert: 0, fcCert: 0, doubleCert: 0, fcStaff: 0,
+    fcStaffWithCert: 0, fcStaffWithDouble: 0,
+    noCrime: 0, over45: 0, under20: 0, age20to45: 0,
+    stores: new Set(), name: c,
+  });
+  for (const r of roster) {
+    const co = mapCompany(findKey(r, ['保安公司', '安保公司']));
+    if (!co) continue;
+    const s = byCompany[co];
+    s.total += 1;
+    const hasSec = hasCert(findKey(r, ['是否持有\n保安证', '是否持有保安证', '保安证', '是否持安保证']));
+    const hasFc = hasCert(findKey(r, ['是否持有\n消控证', '是否持有消控证', '消控证']));
+    if (hasSec) s.secCert += 1;
+    const post = findKey(r, ['岗位']);
+    const isFcPost = post && post.includes('消控');
+    if (isFcPost) {
+      s.fcStaff += 1;
+      if (hasFc) s.fcStaffWithCert += 1;
+      if (hasFc && hasSec) s.fcStaffWithDouble += 1;
+    }
+    if (hasSec && hasFc) s.doubleCert += 1;
+    const store = findKey(r, ['所在门店', '门店', '工作地']);
+    if (store) s.stores.add(store);
+    const age = n(findKey(r, ['年龄']));
+    if (age >= 45) s.over45 += 1;
+    else if (age < 20 && age > 0) s.under20 += 1;
+    else if (age >= 20 && age < 45) s.age20to45 += 1;
+  }
+  let totalNoCrime = 0;
+  let totalLeavers = 0;
+  for (const r of companyRows) {
+    const co = mapCompany(findKey(r, ['保安公司', '公司']));
+    if (!co) continue;
+    const s = byCompany[co];
+    const noCrimeVal = findKey(r, ['持无犯罪记证明人员', '持无犯罪记录证明人员', '无犯罪证明人数']);
+    s.noCrime = n(noCrimeVal);
+    if (s.noCrime > 0) totalNoCrime += s.noCrime;
+    const leavers = n(findKey(r, ['年至今离职人数', '离职人数']));
+    totalLeavers += leavers;
+    const fcHc = n(findKey(r, ['消控岗人数（HC)', '消控岗人数', '消控人数']));
+    if (fcHc > 0 && s.fcStaff === 0) s.fcStaff = fcHc;
+  }
+  if (totalNoCrime === 0) {
+    for (const r of roster) {
+      const co = mapCompany(findKey(r, ['保安公司', '安保公司']));
+      if (!co) continue;
+      const v = findKey(r, ['持无犯罪记证明', '无犯罪证明', '无犯罪记录证明']);
+      if (v && (v === '是' || v === '已办理' || v === '已办')) byCompany[co].noCrime += 1;
+    }
+  }
+  Object.values(byCompany).forEach(s => { s.storeCount = s.stores.size; });
+  for (const r of companyRows) {
+    const co = mapCompany(findKey(r, ['保安公司', '公司']));
+    if (!co) continue;
+    const totalFromSummary = n(findKey(r, ['人员总计', '人员总数', '总人数']));
+    if (byCompany[co].total === 0 && totalFromSummary > 0) byCompany[co].total = totalFromSummary;
+  }
+
+  const total = COMPANIES.reduce((a, c) => a + byCompany[c].total, 0);
+  const totalSec = COMPANIES.reduce((a, c) => a + byCompany[c].secCert, 0);
+  const totalFcStaffWithCert = COMPANIES.reduce((a, c) => a + byCompany[c].fcStaffWithCert, 0);
+  const totalDouble = COMPANIES.reduce((a, c) => a + byCompany[c].fcStaffWithDouble, 0);
+  const totalOver45 = COMPANIES.reduce((a, c) => a + byCompany[c].over45, 0);
+  const totalNoCrimeCalc = COMPANIES.reduce((a, c) => a + byCompany[c].noCrime, 0);
+  const totalFcStaff = COMPANIES.reduce((a, c) => a + byCompany[c].fcStaff, 0);
+
+  // 双证率分母：需要消控证的门店(非无消控岗门店)总人数
+  let fcStoreTotal = 0;
+  for (const r of roster) {
+    const store = findKey(r, ['所在门店', '门店', '工作地']);
+    if (store && !isNoFcStore(store)) fcStoreTotal += 1;
+  }
+
+  // 找各保安公司的主管（岗位=主管的员工，可能门店为空 → 视为负责整个区域/公司）
+  const supervisorsByCompany = {};
+  for (const r of roster) {
+    const role = findKey(r, ['岗位']);
+    if (role !== '主管') continue;
+    const co = mapCompany(findKey(r, ['保安公司']));
+    if (!co) continue;
+    supervisorsByCompany[co] = {
+      name: findKey(r, ['员工姓名', '姓名']) || '-',
+      phone: findKey(r, ['手机号码', '手机号']) || '-',
+      area: findKey(r, ['区域', '工作地']) || '-',
+    };
+  }
+
+  const byStore = {};
+  for (const r of roster) {
+    const store = findKey(r, ['所在门店', '门店']);
+    if (!store) continue;
+    if (!byStore[store]) byStore[store] = {
+      name: store, total: 0, secCert: 0, doubleCert: 0,
+      noFc: isNoFcStore(store),
+      company: mapCompany(findKey(r, ['保安公司'])),
+      supervisor: supervisorsByCompany[mapCompany(findKey(r, ['保安公司']))] || null,
+      people: []
+    };
+    byStore[store].total += 1;
+    if (hasCert(findKey(r, ['是否持有\n保安证', '是否持有保安证', '保安证']))) byStore[store].secCert += 1;
+    if (hasCert(findKey(r, ['是否持有\n保安证', '是否持有保安证', '保安证'])) &&
+        hasCert(findKey(r, ['是否持有\n消控证', '是否持有消控证', '消控证']))) {
+      byStore[store].doubleCert += 1;
+    }
+    byStore[store].people.push({
+      name: findKey(r, ['员工姓名', '姓名']) || '-',
+      gender: findKey(r, ['性别']) || '-',
+      age: findKey(r, ['年龄']) || '-',
+      role: findKey(r, ['岗位']) || '-',
+      joinDate: findKey(r, ['入职日期']) || '-',
+      secCert: findKey(r, ['是否持有\n保安证', '是否持有保安证', '保安证']) || '否',
+      fcCert: findKey(r, ['是否持有\n消控证', '是否持有消控证', '消控证']) || '否',
+      phone: findKey(r, ['手机号码', '手机号', '电话']) || '-',
+    });
+  }
+
+  // Filter sales by selected month
+  const salesFiltered = selectedMonth === 'all' ? sales : sales.filter(r => {
+    const d = findKey(r, ['助力日期\n 年/月/日/', '助力日期', '日期']);
+    if (!d) return false;
+    const dt = new Date(d);
+    if (isNaN(dt)) return false;
+    const m = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+    return m === selectedMonth;
+  });
+  const eventsFiltered = selectedMonth === 'all' ? events : events.filter(r => {
+    const d = findKey(r, ['时间']);
+    if (!d) return false;
+    const dt = new Date(d);
+    if (isNaN(dt)) return false;
+    const m = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+    return m === selectedMonth;
+  });
+
+  // Aggregate sales by month, store, company
+  const salesByMonth = {};
+  const salesByStore = {};
+  const salesByCompany = {};
+  for (const r of salesFiltered) {
+    const dateRaw = findKey(r, ['助力日期\n 年/月/日/', '助力日期', '日期']);
+    const num = n(findKey(r, ['助力销售数量', '数量']));
+    const store = findKey(r, ['订单Order', '门店']);
+    const co = mapCompany(findKey(r, ['备注【所属保安公司】Remarks', '所属保安公司', '保安公司']));
+    if (num === 0 && !dateRaw) continue;
+    let month = '';
+    if (dateRaw) {
+      const dt = new Date(dateRaw);
+      if (!isNaN(dt)) month = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+      else month = String(dateRaw).slice(0, 7);
+    }
+    if (month) salesByMonth[month] = (salesByMonth[month] || 0) + (num || 1);
+    if (store) salesByStore[store] = (salesByStore[store] || 0) + (num || 1);
+    if (co) salesByCompany[co] = (salesByCompany[co] || 0) + (num || 1);
+  }
+  const totalSales = Object.values(salesByMonth).reduce((a, b) => a + b, 0);
+
+  // All-month sales trend (not filtered)
+  const salesTrendAll = {};
+  for (const r of sales) {
+    const dateRaw = findKey(r, ['助力日期\n 年/月/日/', '助力日期', '日期']);
+    const num = n(findKey(r, ['助力销售数量', '数量']));
+    if (!dateRaw) continue;
+    const dt = new Date(dateRaw);
+    if (isNaN(dt)) continue;
+    const m = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+    salesTrendAll[m] = (salesTrendAll[m] || 0) + (num || 1);
+  }
+
+  const eventsByStore = {};
+  const eventsByType = {};
+  const eventsByMonth = {};
+  for (const r of eventsFiltered) {
+    const store = findKey(r, ['门店']);
+    const type = findKey(r, ['事件类型']);
+    const dateRaw = findKey(r, ['时间']);
+    if (!store && !type && !dateRaw) continue;
+    if (store) eventsByStore[store] = (eventsByStore[store] || 0) + 1;
+    if (type) eventsByType[type] = (eventsByType[type] || 0) + 1;
+    if (dateRaw) {
+      const dt = new Date(dateRaw);
+      if (!isNaN(dt)) {
+        const m = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+        eventsByMonth[m] = (eventsByMonth[m] || 0) + 1;
+      }
+    }
+  }
+  const eventTrendAll = {};
+  for (const r of events) {
+    const dateRaw = findKey(r, ['时间']);
+    if (!dateRaw) continue;
+    const dt = new Date(dateRaw);
+    if (isNaN(dt)) continue;
+    const m = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+    eventTrendAll[m] = (eventTrendAll[m] || 0) + 1;
+  }
+  const totalEvents = eventsFiltered.length;
+
+  // 客诉：优先从周报事件详情里识别（事件类型含"客诉"）
+  let complaints = [];
+  const weekly = sheets.weekly || { weeks: [], events: [] };
+  // 兼容老版本 sheet 名直接包含"客诉"
+  for (const k of Object.keys(sheets || {})) {
+    if (k !== 'weekly' && typeof k === 'string' && (k.includes('客诉') || k.includes('投诉'))) {
+      complaints = sheets[k] || [];
+      break;
+    }
+  }
+  if (!complaints.length && weekly.events && weekly.events.length) {
+    complaints = weekly.events.filter(e => {
+      const t = (e.type || '').toString();
+      return /客诉|投诉|纠纷|顾客/.test(t) && e.store;
+    }).map(e => ({
+      时间: e.date || e.weekDate || '',
+      门店: e.store,
+      客诉内容: e.desc || e.type || '',
+      处理情况: '',
+      是否闭环: '',
+      事件类型: e.type,
+    }));
+  } else if (complaints.length) {
+    // 老格式
+  } else if (weekly.events && weekly.events.length) {
+    // 如果客诉关键词一个都没匹配，回退显示所有非空事件
+    complaints = weekly.events.filter(e => e.store).map(e => ({
+      时间: e.date || e.weekDate || '',
+      门店: e.store,
+      客诉内容: (e.type ? '[' + e.type + '] ' : '') + (e.desc || ''),
+      处理情况: '',
+      是否闭环: '',
+      事件类型: e.type,
+    }));
+  }
+  const totalComplaints = complaints.length;
+
+  return {
+    byCompany,
+    byStore,
+    totals: {
+      total,
+      totalSec,
+      totalFcStaff: totalFcStaff,
+      totalFcStaffWithCert: totalFcStaffWithCert,
+      totalDouble,
+      fcStoreTotal,
+      totalOver45,
+      totalNoCrime: totalNoCrimeCalc > 0 ? totalNoCrimeCalc : total,
+      totalLeavers,
+    },
+    sales: {
+      total: totalSales, byMonth: salesByMonth, byStore: salesByStore, byCompany: salesByCompany,
+      records: salesFiltered, trendAll: salesTrendAll,
+    },
+    events: {
+      total: totalEvents, byStore: eventsByStore, byType: eventsByType, byMonth: eventsByMonth,
+      records: eventsFiltered, trendAll: eventTrendAll,
+    },
+    complaints: { total: totalComplaints, records: complaints },
+    weekly,
+    weeklyWeeks: (sheets.weekly && sheets.weekly.weeks) || [],
+  };
+}
+
+function KpiCard({ label, value, sub, onClick, icon }) {
+  return (
+    <div className={"kpi-card" + (onClick ? " clickable" : "")} onClick={onClick}>
+      <div className="accent-bar"></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+        <div style={{ fontSize: 12, color: 'var(--text-2)', letterSpacing: '0.02em' }}>{label}</div>
+        {icon && <div style={{ fontSize: 18, opacity: 0.6 }}>{icon}</div>}
+      </div>
+      <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--text-0)', lineHeight: 1.1 }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 6 }}>{sub}</div>}
+    </div>
+  );
+}
+
+function Donut({ data, centerLabel, centerValue, size = 140, thickness = 16 }) {
+  // 手画 SVG 圆环：避免 ResponsiveContainer 嵌套 flex 高度计算问题
+  const r = (size - thickness) / 2;
+  const cx = size / 2, cy = size / 2;
+  const circumference = 2 * Math.PI * r;
+  const total = data.reduce((s, d) => s + (d.value || 0), 0);
+  let acc = 0;
+  return (
+    <div style={{ position: 'relative', width: size, height: size, margin: '0 auto' }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {data.map((d, i) => {
+          const ratio = total > 0 ? d.value / total : 0;
+          const dash = ratio * circumference;
+          const gap = circumference - dash;
+          const offset = -acc * circumference;
+          acc += ratio;
+          return (
+            <circle
+              key={i}
+              cx={cx} cy={cy} r={r}
+              fill="none"
+              stroke={d.color}
+              strokeWidth={thickness}
+              strokeDasharray={`${dash} ${gap}`}
+              strokeDashoffset={offset}
+              transform={`rotate(-90 ${cx} ${cy})`}
+            />
+          );
+        })}
+      </svg>
+      {centerValue !== undefined && (
+        <div style={{
+          position: 'absolute', top: 0, left: 0, width: size, height: size,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          pointerEvents: 'none', lineHeight: 1.1, whiteSpace: 'nowrap',
+        }}>
+          <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-0)' }}>{centerValue}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-2)', marginTop: 3 }}>{centerLabel}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MultiBar({ data, xKey, series, height = 220 }) {
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#e5e5ea" />
+        <XAxis dataKey={xKey} stroke="#98989d" tick={{ fill: '#6e6e73', fontSize: 11 }} />
+        <YAxis stroke="#98989d" tick={{ fill: '#6e6e73', fontSize: 11 }} allowDecimals={false} />
+        <Tooltip cursor={{ fill: 'rgba(232,33,39,0.05)' }} contentStyle={{ background: 'white', border: '1px solid #e5e5ea', borderRadius: 8, fontSize: 12 }} itemStyle={{ color: '#1d1d1f' }} />
+        <Legend wrapperStyle={{ fontSize: 11, color: '#6e6e73' }} />
+        {series.map((s) => (
+          <Bar key={s.key} dataKey={s.key} name={s.name} fill={s.color} radius={[4, 4, 0, 0]} />
+        ))}
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+function LineTrend({ data, xKey, yKey, color = '#e82127', height = 200 }) {
+  if (data.length < 2) {
+    const v = data[0] ? data[0][yKey] : 0;
+    const label = data[0] ? data[0][xKey] : '';
+    return (
+      <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 4 }}>
+        <div style={{ fontSize: 32, fontWeight: 600, color }}>{v}</div>
+        <div style={{ fontSize: 11, color: 'var(--text-2)' }}>{label} · 数据点不足</div>
+      </div>
+    );
+  }
+  return (
+    <ResponsiveContainer width="100%" height={height}>
+      <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <defs>
+          <linearGradient id={`g-${yKey}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity={0.25} />
+            <stop offset="100%" stopColor={color} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#e5e5ea" />
+        <XAxis dataKey={xKey} stroke="#98989d" tick={{ fill: '#6e6e73', fontSize: 11 }} />
+        <YAxis stroke="#98989d" tick={{ fill: '#6e6e73', fontSize: 11 }} allowDecimals={false} />
+        <Tooltip contentStyle={{ background: 'white', border: '1px solid #e5e5ea', borderRadius: 8, fontSize: 12 }} itemStyle={{ color: '#1d1d1f' }} />
+        <Area type="monotone" dataKey={yKey} stroke={color} fill={`url(#g-${yKey})`} strokeWidth={2} dot={{ fill: color, r: 3, strokeWidth: 0 }} activeDot={{ r: 5, fill: color, strokeWidth: 0 }} />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+}
+
+function ImagePreview({ src, alt }) {
+  const [open, setOpen] = useState(false);
+  if (!src) return <span className="text-dim">-</span>;
+  return (
+    <>
+      <img src={src} alt={alt || ''} className="image-thumb" onClick={() => setOpen(true)}
+           onError={(e) => { e.target.style.display = 'none'; }} />
+      {open && (
+        <div className="modal-overlay" onClick={() => setOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}
+               style={{ background: 'transparent', border: 'none', padding: 0 }}>
+            <img src={src} alt={alt || ''} style={{ maxWidth: '90vw', maxHeight: '85vh', borderRadius: 8 }} />
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function StoreCard({ store, onClick }) {
+  const certRate = store.total === 0 ? 0 : (store.secCert / store.total);
+  const doubleRate = store.total === 0 ? 0 : (store.doubleCert / store.total);
+  const color = COMPANY_COLORS[store.company] || '#888';
+  const noFc = !!store.noFc;
+  return (
+    <div className="store-card" onClick={onClick} style={{ cursor: 'pointer' }}
+         title="点击查看门店花名册">
+      <div>
+        <div className="store-name">{store.name}</div>
+        <div className="store-co" style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: color, display: 'inline-block' }}></span>
+          {store.company || '未分类'}
+          {noFc && <span className="pill pill-gray" style={{ marginLeft: 4, fontSize: 9 }}>无消控岗</span>}
+        </div>
+      </div>
+      <div className="store-stats">
+        <div className="stat">
+          <div className="stat-v">{store.total}</div>
+          <div className="stat-l">人数</div>
+        </div>
+        <div className="stat">
+          <div className="stat-v">{store.secCert}</div>
+          <div className="stat-l">持保安证</div>
+        </div>
+        {!noFc && <div className="stat">
+          <div className="stat-v">{store.doubleCert}</div>
+          <div className="stat-l">双证</div>
+        </div>}
+      </div>
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-2)', marginBottom: 3 }}>
+          <span>持证率</span><span>{fmtPct(certRate)}</span>
+        </div>
+        <div className="bar-track">
+          <div className="bar-fill" style={{ width: `${Math.min(100, certRate * 100)}%`, background: '#0066cc' }}></div>
+        </div>
+      </div>
+      {!noFc && <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-2)', marginBottom: 3 }}>
+          <span>双证率</span><span>{fmtPct(doubleRate)}</span>
+        </div>
+        <div className="bar-track">
+          <div className="bar-fill" style={{ width: `${Math.min(100, doubleRate * 100)}%`, background: '#e82127' }}></div>
+        </div>
+      </div>}
+      <div style={{ fontSize: 10, color: 'var(--text-3)', textAlign: 'right', marginTop: 2 }}>点击查看花名册 ›</div>
+    </div>
+  );
+}
+
+function StoreDetailModal({ store, onClose }) {
+  if (!store) return null;
+  const people = store.people || [];
+  const color = COMPANY_COLORS[store.company] || '#888';
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}
+           style={{ maxWidth: 760, width: '92vw', maxHeight: '88vh', padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-0)' }}>{store.name}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, display: 'inline-block' }}></span>
+              {store.company || '未分类'} · 共 {people.length} 人
+              {store.noFc && <span className="pill pill-gray" style={{ fontSize: 9 }}>无消控岗</span>}
+            </div>
+            {store.supervisor && (
+              <div style={{ fontSize: 12, color: 'var(--text-1)', marginTop: 6, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{ padding: '2px 8px', background: 'rgba(0,102,204,0.1)', color: '#0066cc', borderRadius: 4, fontSize: 10, fontWeight: 500 }}>主管</span>
+                <span style={{ fontWeight: 500 }}>{store.supervisor.name}</span>
+                <a href={`tel:${store.supervisor.phone}`} style={{ color: 'var(--text-2)', textDecoration: 'none' }}>{store.supervisor.phone}</a>
+                {store.supervisor.area && <span style={{ color: 'var(--text-3)', fontSize: 11 }}>· 负责 {store.supervisor.area}</span>}
+              </div>
+            )}
+          </div>
+          <button onClick={onClose} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: 'var(--text-1)', fontSize: 13 }}>关闭</button>
+        </div>
+        <div style={{ overflow: 'auto', flex: 1, padding: '4px 0' }}>
+          <table className="store-detail-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+            <thead>
+              <tr style={{ background: 'var(--bg-soft)' }}>
+                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 500, color: 'var(--text-2)', fontSize: 11, position: 'sticky', top: 0, background: 'var(--bg-soft)' }}>姓名</th>
+                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 500, color: 'var(--text-2)', fontSize: 11, position: 'sticky', top: 0, background: 'var(--bg-soft)' }}>岗位</th>
+                <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 500, color: 'var(--text-2)', fontSize: 11, position: 'sticky', top: 0, background: 'var(--bg-soft)' }}>电话</th>
+                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 500, color: 'var(--text-2)', fontSize: 11, position: 'sticky', top: 0, background: 'var(--bg-soft)' }}>保安证</th>
+                <th style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 500, color: 'var(--text-2)', fontSize: 11, position: 'sticky', top: 0, background: 'var(--bg-soft)' }}>消控证</th>
+              </tr>
+            </thead>
+            <tbody>
+              {people.length === 0 && (
+                <tr><td colSpan="5" style={{ padding: 20, textAlign: 'center', color: 'var(--text-3)' }}>暂无人员数据</td></tr>
+              )}
+              {people.map((p, i) => (
+                <tr key={i} style={{ borderTop: '1px solid var(--border)' }}>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-0)', fontWeight: 500 }}>{p.name}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-1)' }}>{p.role}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-1)' }}>{p.phone}</td>
+                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                    {p.secCert === '是' || /是|有|初级|中级|高级/.test(p.secCert)
+                      ? <span className="pill" style={{ background: 'rgba(0,166,81,0.12)', color: '#00a651', fontSize: 10 }}>已持</span>
+                      : <span className="pill" style={{ background: 'rgba(232,33,39,0.12)', color: '#e82127', fontSize: 10 }}>未持</span>}
+                  </td>
+                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                    {p.fcCert === '否' || !p.fcCert
+                      ? <span style={{ color: 'var(--text-3)', fontSize: 12 }}>—</span>
+                      : <span className="pill" style={{ background: 'rgba(0,166,81,0.12)', color: '#00a651', fontSize: 10 }}>{p.fcCert}</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ComplaintsPage({ stats, onBack, headerExtra }) {
+  const records = stats.complaints.records;
+  const [search, setSearch] = useState('');
+  const [store, setStore] = useState('all');
+  const [closed, setClosed] = useState('all');
+
+  const stores = useMemo(() => {
+    const set = new Set();
+    records.forEach(r => { const s = findKey(r, ['门店']); if (s) set.add(s); });
+    return Array.from(set).sort();
+  }, [records]);
+
+  const filtered = useMemo(() => {
+    return records.filter(r => {
+      const s = findKey(r, ['门店']);
+      const c = findKey(r, ['是否闭环', '闭环']);
+      const isClosed = c === '是' || c === '已闭环' || c === 'yes';
+      if (store !== 'all' && s !== store) return false;
+      if (closed === 'yes' && !isClosed) return false;
+      if (closed === 'no' && isClosed) return false;
+      if (search) {
+        const hay = Object.values(r).join(' ').toLowerCase();
+        if (!hay.includes(search.toLowerCase())) return false;
+      }
+      return true;
+    });
+  }, [records, search, store, closed]);
+
+  return (
+    <div style={{ minHeight: '100vh', padding: '24px 32px' }}>
+      <Header onBack={onBack} title="客诉事件详情" subtitle={`共 ${records.length} 条`}>{headerExtra}</Header>
+      {records.length === 0 ? (
+        <div className="section" style={{ textAlign: 'center', padding: 60, color: 'var(--text-2)' }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+          <div style={{ fontSize: 16, color: 'var(--text-0)' }}>暂无客诉记录</div>
+          <div style={{ fontSize: 12, marginTop: 8 }}>客诉数据来源于周报，本月周报中未录入</div>
+        </div>
+      ) : (
+        <div className="section">
+          <FilterBar search={search} setSearch={setSearch}>
+            <select className="filter" value={store} onChange={(e) => setStore(e.target.value)}>
+              <option value="all">全部门店</option>
+              {stores.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+            <select className="filter" value={closed} onChange={(e) => setClosed(e.target.value)}>
+              <option value="all">全部状态</option>
+              <option value="yes">已闭环</option>
+              <option value="no">未闭环</option>
+            </select>
+          </FilterBar>
+          <DataTable headers={['时间', '门店', '客诉内容', '处理情况', '是否闭环']}
+            rows={filtered.map(r => [
+              findKey(r, ['时间']) || '-',
+              findKey(r, ['门店']) || '-',
+              findKey(r, ['客诉内容', '内容', '描述']) || '-',
+              findKey(r, ['处理情况', '处理']) || '-',
+              (() => {
+                const c = findKey(r, ['是否闭环', '闭环']);
+                const isClosed = c === '是' || c === '已闭环' || c === 'yes';
+                return <span className={'pill ' + (isClosed ? 'pill-green' : 'pill-yellow')}>{isClosed ? '已闭环' : '未闭环'}</span>;
+              })()
+            ])} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SalesPage({ stats, onBack, headerExtra, selectedMonth }) {
+  const records = stats.sales.records;
+  const [search, setSearch] = useState('');
+  const [store, setStore] = useState('all');
+  const [sort, setSort] = useState('date_desc');
+
+  const stores = useMemo(() => {
+    const set = new Set();
+    records.forEach(r => { const s = findKey(r, ['订单Order', '门店']); if (s) set.add(s); });
+    return Array.from(set).sort();
+  }, [records]);
+
+  const filtered = useMemo(() => {
+    let arr = records.filter(r => {
+      const s = findKey(r, ['订单Order', '门店']);
+      if (store !== 'all' && s !== store) return false;
+      if (search) {
+        const hay = Object.values(r).join(' ').toLowerCase();
+        if (!hay.includes(search.toLowerCase())) return false;
+      }
+      return true;
+    });
+    arr.sort((a, b) => {
+      if (sort === 'date_desc') return String(findKey(b, ['助力日期\n 年/月/日/', '助力日期', '日期'])).localeCompare(String(findKey(a, ['助力日期\n 年/月/日/', '助力日期', '日期'])));
+      if (sort === 'date_asc') return String(findKey(a, ['助力日期\n 年/月/日/', '助力日期', '日期'])).localeCompare(String(findKey(b, ['助力日期\n 年/月/日/', '助力日期', '日期'])));
+      if (sort === 'qty_desc') return n(findKey(b, ['助力销售数量', '数量'])) - n(findKey(a, ['助力销售数量', '数量']));
+      return 0;
+    });
+    return arr;
+  }, [records, search, store, sort]);
+
+  const storeRank = useMemo(() => {
+    return Object.entries(stats.sales.byStore)
+      .map(([s, v]) => ({ name: s, value: v }))
+      .sort((a, b) => b.value - a.value);
+  }, [stats]);
+
+  // Use all-month trend (so the chart shows context)
+  const monthlyData = useMemo(() => {
+    return Object.entries(stats.sales.trendAll)
+      .map(([m, v]) => ({ month: m, value: v }))
+      .sort((a, b) => a.month.localeCompare(b.month));
+  }, [stats]);
+
+  return (
+    <div style={{ minHeight: '100vh', padding: '24px 32px' }}>
+      <Header onBack={onBack} title="助力销售详情" subtitle={`当前月份 ${selectedMonth} · 共 ${records.length} 单 · 累计 ${stats.sales.total}`}>{headerExtra}</Header>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+        <div className="section">
+          <div className="section-title">月度趋势 <span className="badge">近 {monthlyData.length} 个月</span></div>
+          {monthlyData.length > 0 ? <LineTrend data={monthlyData} xKey="month" yKey="value" color="#0066cc" /> : <EmptyState />}
+        </div>
+        <div className="section">
+          <div className="section-title">门店排名 <span className="badge">TOP {Math.min(10, storeRank.length)}</span></div>
+          {storeRank.length > 0 ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={storeRank.slice(0, 10)} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e5ea" />
+                <XAxis type="number" stroke="#98989d" tick={{ fill: '#6e6e73', fontSize: 11 }} allowDecimals={false} />
+                <YAxis type="category" dataKey="name" stroke="#98989d" tick={{ fill: '#6e6e73', fontSize: 11 }} width={100} />
+                <Tooltip cursor={{ fill: 'rgba(232,33,39,0.05)' }} contentStyle={{ background: 'white', border: '1px solid #e5e5ea', borderRadius: 8, fontSize: 12 }} itemStyle={{ color: '#1d1d1f' }} />
+                <Bar dataKey="value" fill="#e82127" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : <EmptyState />}
+        </div>
+      </div>
+      <div className="section">
+        <div className="section-title">记录明细 <span className="badge">{filtered.length} 条</span></div>
+        <FilterBar search={search} setSearch={setSearch}>
+          <select className="filter" value={store} onChange={(e) => setStore(e.target.value)}>
+            <option value="all">全部门店</option>
+            {stores.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <select className="filter" value={sort} onChange={(e) => setSort(e.target.value)}>
+            <option value="date_desc">时间倒序</option>
+            <option value="date_asc">时间正序</option>
+            <option value="qty_desc">数量从高到低</option>
+          </select>
+        </FilterBar>
+        <DataTable headers={['时间', '门店', '推荐人', '数量', '车型', '订单号', '所属保安公司']}
+          rows={filtered.map(r => [
+            findKey(r, ['助力日期\n 年/月/日/', '助力日期', '日期']) || '-',
+            findKey(r, ['订单Order', '门店']) || '-',
+            findKey(r, ['推荐人姓名', '推荐人']) || '-',
+            <span className="pill pill-red">{findKey(r, ['助力销售数量', '数量']) || 0}</span>,
+            findKey(r, ['订单/试驾车型', '车型']) || '-',
+            <code style={{ fontSize: 11, color: 'var(--text-2)' }}>{findKey(r, ['销售订单号', '订单号']) || '-'}</code>,
+            findKey(r, ['备注【所属保安公司】', '所属保安公司']) || '-',
+          ])} />
+      </div>
+    </div>
+  );
+}
+
+function EventsPage({ stats, onBack, headerExtra, selectedMonth }) {
+  const records = stats.events.records.filter(r => Object.values(r).some(v => v && String(v).trim()));
+  const [search, setSearch] = useState('');
+  const [store, setStore] = useState('all');
+  const [type, setType] = useState('all');
+
+  const stores = useMemo(() => {
+    const set = new Set();
+    records.forEach(r => { const s = findKey(r, ['门店']); if (s) set.add(s); });
+    return Array.from(set).sort();
+  }, [records]);
+
+  const types = useMemo(() => {
+    const set = new Set();
+    records.forEach(r => { const t = findKey(r, ['事件类型']); if (t) set.add(t); });
+    return Array.from(set).sort();
+  }, [records]);
+
+  const filtered = useMemo(() => {
+    return records.filter(r => {
+      const s = findKey(r, ['门店']);
+      const t = findKey(r, ['事件类型']);
+      if (store !== 'all' && s !== store) return false;
+      if (type !== 'all' && t !== type) return false;
+      if (search) {
+        const hay = Object.values(r).join(' ').toLowerCase();
+        if (!hay.includes(search.toLowerCase())) return false;
+      }
+      return true;
+    });
+  }, [records, search, store, type]);
+
+  return (
+    <div style={{ minHeight: '100vh', padding: '24px 32px' }}>
+      <Header onBack={onBack} title="亮点事件详情" subtitle={`当前月份 ${selectedMonth} · 共 ${records.length} 条`}>{headerExtra}</Header>
+      {records.length === 0 ? (
+        <div className="section" style={{ textAlign: 'center', padding: 60, color: 'var(--text-2)' }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>⭐</div>
+          <div style={{ fontSize: 16, color: 'var(--text-0)' }}>暂无亮点事件</div>
+          <div style={{ fontSize: 12, marginTop: 8 }}>可在 Excel「亮点事件」Sheet 中补充记录</div>
+        </div>
+      ) : (
+        <div className="section">
+          <FilterBar search={search} setSearch={setSearch}>
+            <select className="filter" value={store} onChange={(e) => setStore(e.target.value)}>
+              <option value="all">全部门店</option>
+              {stores.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+            <select className="filter" value={type} onChange={(e) => setType(e.target.value)}>
+              <option value="all">全部类型</option>
+              {types.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </FilterBar>
+          <DataTable headers={['时间', '门店', '事件类型', '人员姓名', '事件描述', '结果/影响', '图片']}
+            rows={filtered.map(r => [
+              findKey(r, ['时间']) || '-',
+              findKey(r, ['门店']) || '-',
+              <span className="pill pill-purple">{findKey(r, ['事件类型']) || '-'}</span>,
+              findKey(r, ['人员姓名', '姓名']) || '-',
+              findKey(r, ['事件描述', '描述']) || '-',
+              findKey(r, ['结果/影响', '结果', '影响']) || '-',
+              <ImagePreview src={findKey(r, ['图片'])} alt={findKey(r, ['事件描述', '描述'])} />,
+            ])} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WeeklyPage({ sheets, onBack, headerExtra, selectedMonth }) {
+  const [openWeek, setOpenWeek] = useState(null);
+  const [lightbox, setLightbox] = useState(null);
+  const weekly = sheets.weekly || { weeks: [] };
+  const allEvents = weekly.events || [];
+  // 按月过滤
+  const weeks = useMemo(() => {
+    let list = weekly.weeks || [];
+    if (selectedMonth && selectedMonth !== 'all') {
+      list = list.filter(w => (w.dateLabel || '').startsWith(selectedMonth));
+    }
+    return list.slice().sort((a, b) => (b.dateLabel || '').localeCompare(a.dateLabel || ''));
+  }, [weekly.weeks, selectedMonth]);
+
+  const totalImgs = (weekly.allImages || []).length;
+  const weeksWithImg = (weekly.weeks || []).filter(w => w.events.some(e => (e.images || []).length > 0)).length;
+  const COMPLAINT_RE = /客诉|投诉/;
+  const complaintStyle = (type) => COMPLAINT_RE.test(type)
+    ? { background: 'rgba(232,33,39,0.12)', color: '#e82127' }
+    : { background: 'rgba(0,102,204,0.12)', color: '#0066cc' };
+
+  return (
+    <div style={{ minHeight: '100vh', padding: '24px 32px' }}>
+      <Header onBack={onBack} title="周报中心" subtitle={`${weeks.length} 周周报 · 共 ${allEvents.length} 条事件${totalImgs ? ' · 含 ' + totalImgs + ' 张现场图片' : ''}`}>{headerExtra}</Header>
+
+      {weeks.length === 0 ? <EmptyState text={selectedMonth ? `所选月份 ${selectedMonth} 暂无周报` : '暂无周报数据'} /> : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {weeks.map((w, idx) => {
+            const opened = openWeek === (w._col ?? idx);
+            const evs = w.events || [];
+            const imgs = evs.reduce((s, e) => s + (e.images || []).length, 0);
+            return (
+              <div key={idx} className="section" style={{ marginBottom: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                     onClick={() => setOpenWeek(opened ? null : (w._col ?? idx))}>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-0)' }}>📅 周报 · {w.dateLabel}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 4, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                      <span>门店总数 <b style={{ color: 'var(--text-0)' }}>{w.storeCount}</b></span>
+                      <span>安保总人数 <b style={{ color: 'var(--text-0)' }}>{w.totalStaff}</b></span>
+                      <span>巡店 <b style={{ color: 'var(--text-0)' }}>{w.patrolCount}</b> 次</span>
+                      <span>问题 <b style={{ color: '#e82127' }}>{w.issueCount}</b></span>
+                      <span>已闭环 <b style={{ color: '#00a651' }}>{w.issueClosed}</b></span>
+                      <span>事件 <b style={{ color: 'var(--text-0)' }}>{evs.length}</b></span>
+                      {imgs > 0 && <span style={{ color: '#0066cc' }}>📷 {imgs} 张</span>}
+                    </div>
+                  </div>
+                  <div style={{ color: 'var(--text-3)', fontSize: 18 }}>{opened ? '▾' : '▸'}</div>
+                </div>
+
+                {opened && (
+                  <div style={{ marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+                    {evs.length === 0 ? <div style={{ color: 'var(--text-3)', fontSize: 12, padding: 8 }}>本周无事件记录</div> : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {evs.map((e, i) => (
+                          <div key={i} style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, padding: 12 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+                              {e.store && <span className="pill" style={{ background: 'var(--bg-soft)', color: 'var(--text-0)', fontSize: 11, fontWeight: 500 }}>📍 {e.store}</span>}
+                              {e.type && <span className="pill" style={{ ...complaintStyle(e.type), fontSize: 11 }}>{e.type}</span>}
+                              {e.date && <span style={{ fontSize: 11, color: 'var(--text-3)' }}>⏰ {e.date}</span>}
+                            </div>
+                            {e.desc && <div style={{ fontSize: 12, color: 'var(--text-1)', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{e.desc}</div>}
+                            {(e.images || []).length > 0 && (
+                              <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(96px, 1fr))', gap: 6 }}>
+                                {e.images.map((src, j) => (
+                                  <img key={j} src={src} alt="" className="image-thumb"
+                                       onClick={() => setLightbox(src)}
+                                       style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 6, cursor: 'zoom-in' }} />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {lightbox && (
+        <div className="modal-overlay" onClick={() => setLightbox(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ background: 'transparent', border: 'none', padding: 0 }}>
+            <img src={lightbox} alt="" style={{ maxWidth: '92vw', maxHeight: '88vh', borderRadius: 8 }} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RosterPage({ stats, sheets, onBack, headerExtra }) {
+  const [search, setSearch] = useState('');
+  const [company, setCompany] = useState('all');
+  const [store, setStore] = useState('all');
+  const [showAll, setShowAll] = useState(false);
+
+  const roster = sheets.roster || [];
+  const stores = useMemo(() => {
+    const set = new Set();
+    roster.forEach(r => { const s = findKey(r, ['所在门店', '门店']); if (s) set.add(s); });
+    return Array.from(set).sort();
+  }, [roster]);
+
+  const filtered = useMemo(() => {
+    return roster.filter(r => {
+      const co = mapCompany(findKey(r, ['保安公司']));
+      const st = findKey(r, ['所在门店', '门店']);
+      if (company !== 'all' && co !== company) return false;
+      if (store !== 'all' && st !== store) return false;
+      if (search) {
+        const hay = Object.values(r).join(' ').toLowerCase();
+        if (!hay.includes(search.toLowerCase())) return false;
+      }
+      return true;
+    });
+  }, [roster, search, company, store]);
+
+  return (
+    <div style={{ minHeight: '100vh', padding: '24px 32px' }}>
+      <Header onBack={onBack} title="花名册明细" subtitle={`共 ${roster.length} 人 · ${showAll ? '已显示' : '已隐藏'}`}>{headerExtra}</Header>
+      <div className="section">
+        <div style={{ marginBottom: 12, padding: 12, background: 'var(--accent-soft)', border: '1px solid #fbd5d5', borderRadius: 8, fontSize: 12, color: 'var(--text-1)' }}>
+          ⚠️ 此页面包含员工个人信息（姓名、电话、身份证号），仅供授权人员查看。默认隐藏。
+          <button className="btn" style={{ marginLeft: 12 }} onClick={() => setShowAll(!showAll)}>
+            {showAll ? '隐藏花名册' : '显示花名册'}
+          </button>
+        </div>
+        {showAll ? (
+          <>
+            <FilterBar search={search} setSearch={setSearch}>
+              <select className="filter" value={company} onChange={(e) => setCompany(e.target.value)}>
+                <option value="all">全部公司</option>
+                {COMPANIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <select className="filter" value={store} onChange={(e) => setStore(e.target.value)}>
+                <option value="all">全部门店</option>
+                {stores.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </FilterBar>
+            <DataTable headers={['姓名', '性别', '年龄', '公司', '门店', '岗位', '入职日期', '保安证', '消控证', '手机号码', '身份证号', '户籍地址', '紧急联系人', '联系电话']}
+              rows={filtered.map(r => {
+                const idNo = findKey(r, ['身份证号码', '身份证号', '身份证']);
+                const phone = findKey(r, ['手机号码', '手机', '联系电话']);
+                const sos = findKey(r, ['紧急联系人']);
+                const sosPhone = findKey(r, ['联系电话', '紧急联系电话']);
+                return [
+                  findKey(r, ['员工姓名', '姓名']) || '-',
+                  findKey(r, ['性别']) || '-',
+                  findKey(r, ['年龄']) || '-',
+                  mapCompany(findKey(r, ['保安公司'])) || '-',
+                  findKey(r, ['所在门店', '门店']) || '-',
+                  findKey(r, ['岗位']) || '-',
+                  findKey(r, ['入职日期']) || '-',
+                  hasCert(findKey(r, ['是否持有\n保安证', '是否持有保安证', '保安证'])) ?
+                    <span className="pill pill-green">是</span> : <span className="pill pill-gray">否</span>,
+                  hasCert(findKey(r, ['是否持有\n消控证', '是否持有消控证', '消控证'])) ?
+                    <span className="pill pill-green">是</span> : <span className="pill pill-gray">否</span>,
+                  phone || '-',
+                  idNo || '-',
+                  <span style={{ fontSize: 11, color: 'var(--text-2)' }}>{findKey(r, ['户籍地址']) || '-'}</span>,
+                  sos || '-',
+                  sosPhone || '-',
+                ];
+              })} />
+          </>
+        ) : (
+          <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-2)' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
+            <div style={{ fontSize: 16, color: 'var(--text-0)' }}>花名册已隐藏</div>
+            <div style={{ fontSize: 12, marginTop: 8 }}>点击上方"显示花名册"按钮查看完整人员信息</div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Header({ onBack, title, subtitle, children }) {
+  return (
+    <div className="app-header" style={{ display: 'flex', alignItems: 'center', marginBottom: 24, gap: 16, flexWrap: 'wrap' }}>
+      {onBack && (
+        <button className="btn" onClick={onBack} style={{ padding: '8px 14px' }}>← 返回</button>
+      )}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: 'white' }}>T</div>
+          <h1 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-0)' }}>{title || '华中区特斯拉项目 · 安保管理面板'}</h1>
+        </div>
+        {subtitle && <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 4, marginLeft: 40 }}>{subtitle}</div>}
+      </div>
+      {children && <div className="app-header-actions" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>{children}</div>}
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)', fontSize: 12 }}>
+      暂无数据
+    </div>
+  );
+}
+
+function FilterBar({ search, setSearch, children }) {
+  return (
+    <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+      <input className="search" placeholder="搜索..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ minWidth: 200 }} />
+      {children}
+    </div>
+  );
+}
+
+function DataTable({ headers, rows }) {
+  return (
+    <div style={{ overflow: 'auto', maxHeight: '60vh' }}>
+      <table className="data-table">
+        <thead>
+          <tr>{headers.map((h, i) => <th key={i}>{h}</th>)}</tr>
+        </thead>
+        <tbody>
+          {rows.length === 0 ? (
+            <tr><td colSpan={headers.length} style={{ textAlign: 'center', padding: 30, color: 'var(--text-3)' }}>暂无数据</td></tr>
+          ) : rows.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j}>{c}</td>)}</tr>)}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function MonthSelector({ months, selected, onChange }) {
+  return (
+    <div className="month-pill" title="切换月份查看数据">
+      <span className="dot"></span>
+      <span>月份</span>
+      <select
+        className="filter"
+        style={{ padding: '2px 4px', border: 'none', background: 'transparent', fontSize: 13, fontWeight: 600, color: 'var(--text-0)', boxShadow: 'none' }}
+        value={selected}
+        onChange={(e) => onChange(e.target.value)}>
+        {months.map(m => <option key={m} value={m}>{m}</option>)}
+      </select>
+    </div>
+  );
+}
+
+// 月度对比 / 例外项
+function MonthlyDiff({ weeks, selectedMonth }) {
+  // 过滤出属于 selectedMonth 的周（按 dateLabel 的 yyyy-mm 前缀）
+  const inMonth = (weeks || []).filter(w => selectedMonth && w.dateLabel && w.dateLabel.startsWith(selectedMonth));
+  if (inMonth.length < 2) {
+    return (
+      <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-2)', fontSize: 13 }}>
+        <div style={{ fontSize: 32, marginBottom: 8 }}>📊</div>
+        {inMonth.length === 0
+          ? `所选月份 ${selectedMonth || '—'} 在周报中暂无数据`
+          : `所选月份 ${selectedMonth} 仅有 ${inMonth.length} 周周报，至少需要 2 周才能做对比`}
+      </div>
+    );
+  }
+  const first = inMonth[0];
+  const last = inMonth[inMonth.length - 1];
+  const diffs = [];
+  const push = (label, a, b, fmt = (v) => v) => {
+    if (a === b) return;
+    diffs.push({ label, a: fmt(a), b: fmt(b), delta: b - a });
+  };
+  push('安保总人数', first.totalStaff, last.totalStaff);
+  push('门店总数', first.storeCount, last.storeCount);
+  push('本周巡店次数', first.patrolCount, last.patrolCount);
+  push('巡店问题数', first.issueCount, last.issueCount);
+  push('巡店闭环数', first.issueClosed, last.issueClosed);
+  // 客诉事件
+  const firstEvents = (first.events || []).filter(e => /客诉|投诉|纠纷|顾客/.test(e.type || ''));
+  const lastEvents = (last.events || []).filter(e => /客诉|投诉|纠纷|顾客/.test(e.type || ''));
+  push('客诉事件数', firstEvents.length, lastEvents.length);
+
+  if (diffs.length === 0) {
+    return (
+      <div style={{ padding: 16, fontSize: 13, color: 'var(--text-2)' }}>
+        <div style={{ marginBottom: 6 }}>对比区间：{first.dateLabel} → {last.dateLabel}</div>
+        <div>✅ 当前月份各项数据与月初持平，无例外项</div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, fontSize: 12, color: 'var(--text-2)' }}>
+        <span className="pill pill-blue">月初 {first.dateLabel}</span>
+        <span>→</span>
+        <span className="pill pill-purple">本周末 {last.dateLabel}</span>
+        <span style={{ marginLeft: 'auto' }}>共 {diffs.length} 项变化</span>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10 }}>
+        {diffs.map((d, i) => {
+          const isUp = d.delta > 0;
+          const isGood = d.label.includes('闭环') || d.label.includes('巡店次数');
+          const good = isGood ? isUp : !isUp;
+          return (
+            <div key={i} style={{ padding: '12px 14px', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 10 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-2)', marginBottom: 6 }}>{d.label}</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--text-0)' }}>{d.b}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-3)' }}>（月初 {d.a}）</div>
+              </div>
+              <div style={{ marginTop: 6, fontSize: 11, fontWeight: 500, color: good ? 'var(--ok)' : 'var(--accent)' }}>
+                {isUp ? '▲' : '▼'} {Math.abs(d.delta)} {good ? '· 改善' : '· 关注'}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {firstEvents.length + lastEvents.length > 0 && (
+        <div style={{ marginTop: 14, padding: 12, background: 'var(--accent-soft)', border: '1px solid #fbd5d5', borderRadius: 8, fontSize: 12, color: 'var(--text-1)' }}>
+          <strong>客诉明细：</strong>
+          {firstEvents.length > 0 && <div>· {first.dateLabel}：{firstEvents.map(e => e.store).filter(Boolean).join('、') || '—'}</div>}
+          {lastEvents.length > 0 && <div>· {last.dateLabel}：{lastEvents.map(e => e.store).filter(Boolean).join('、') || '—'}</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Dashboard({ stats, sheets, onNavigate, headerExtra, selectedMonth, availableMonths }) {
+  const t = stats.totals;
+  const companyPieData = COMPANIES.map(c => ({
+    name: c, value: stats.byCompany[c].total, color: COMPANY_COLORS[c]
+  })).filter(d => d.value > 0);
+  const storeList = Object.values(stats.byStore)
+    .sort((a, b) => b.total - a.total);
+  const [openStore, setOpenStore] = useState(null);
+  const salesTrend = Object.entries(stats.sales.trendAll)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([m, v]) => ({ month: m, value: v }));
+  const eventTrend = Object.entries(stats.events.trendAll)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([m, v]) => ({ month: m, value: v }));
+  const certDonut = [
+    { name: '已持证', value: t.totalSec, color: '#00875a' },
+    { name: '未持证', value: Math.max(0, t.total - t.totalSec), color: '#e5e5ea' },
+  ];
+  const doubleDonut = [
+    { name: '已双证', value: t.totalDouble, color: '#e82127' },
+    { name: '未双证', value: Math.max(0, t.total - t.totalDouble), color: '#e5e5ea' },
+  ];
+
+  // Month display label
+  const monthLabel = `${selectedMonth} 整月数据汇总`;
+
+  return (
+    <div style={{ minHeight: '100vh', padding: '24px 32px' }}>
+      <Header subtitle={`${monthLabel} · 区域管理人员视图`}>{headerExtra}</Header>
+      {/* 人员概况 */}
+      <div className="section" style={{ marginBottom: 16 }}>
+        <div className="section-title">人员概况 <span className="badge">三家公司合计</span></div>
+        <div className="kpi-grid-5" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 16 }}>
+          <KpiCard label="区域总人数" value={t.total} sub="三公司合计" />
+          <KpiCard label="保安证持证人数" value={t.totalSec} sub={`持证率 ${fmtPct(t.totalSec / t.total)}`} />
+          <KpiCard label="消控人数" value={t.totalFcStaff} sub="消控岗位 HC" />
+          <KpiCard label="消控证持证人数" value={t.totalFcStaffWithCert} sub={`持证率 ${fmtPct(t.totalFcStaffWithCert / Math.max(1, t.totalFcStaff))}`} />
+          <KpiCard label="双证人数" value={t.totalDouble} sub={`双证率 ${fmtPct(t.totalDouble / Math.max(1, t.fcStoreTotal))} · 基数 ${t.fcStoreTotal}`} />
+        </div>
+        <div className="kpi-grid-5" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+          <KpiCard label="大龄人员 (≥45岁)" value={t.totalOver45} sub={`占比 ${fmtPct(t.totalOver45 / t.total)}`} />
+          <KpiCard label="离职人数" value={t.totalLeavers} sub="年至今累计" />
+          <KpiCard label="无犯罪证明人数" value={t.totalNoCrime} sub={`覆盖率 ${fmtPct(t.totalNoCrime / t.total)}`} />
+          <div style={{ gridColumn: 'span 2' }} className="donut-card-row">
+            <div className="kpi-card" style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 20px' }}>
+              <div style={{ fontSize: 12, color: 'var(--text-2)', letterSpacing: '0.02em', flexShrink: 0 }}>持证率概览</div>
+              <div style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-around' }}>
+                <Donut data={certDonut} centerValue={fmtPct(t.totalSec / t.total)} centerLabel="保安证" size={100} thickness={11} />
+                <Donut data={doubleDonut} centerValue={fmtPct(t.totalDouble / Math.max(1, t.fcStoreTotal))} centerLabel="双证" size={100} thickness={11} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 运营概况 */}
+      <div className="section" style={{ marginBottom: 16 }}>
+        <div className="section-title">运营概况 <span className="badge">{monthLabel}</span></div>
+        <div className="kpi-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          <KpiCard label="周报数量" value={(stats.weeklyWeeks || []).length} sub="点击查看详情"
+            onClick={() => onNavigate('weekly')} />
+          <KpiCard label="客诉总数量" value={stats.complaints.total} sub={stats.complaints.total > 0 ? '点击查看详情' : '周报暂无记录'}
+            onClick={() => onNavigate('complaints')} />
+          <KpiCard label="助力销售总数量" value={stats.sales.total} sub="点击查看详情" onClick={() => onNavigate('sales')} />
+          <KpiCard label="亮点事件总数量" value={stats.events.total} sub="点击查看详情" onClick={() => onNavigate('events')} />
+        </div>
+      </div>
+
+      {/* 安保公司分布 */}
+      <div className="section" style={{ marginBottom: 16 }}>
+        <div className="section-title">安保公司分布 <span className="badge">人员占比</span></div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 16, alignItems: 'center' }}>
+          <div>
+            {companyPieData.length > 0 ? (
+              <Donut data={companyPieData} centerValue={t.total} centerLabel="总人数" height={220} />
+            ) : <EmptyState />}
+          </div>
+          <div>
+            <MultiBar data={COMPANIES.map(c => ({
+              name: c,
+              总人数: stats.byCompany[c].total,
+              持证: stats.byCompany[c].secCert,
+              双证: stats.byCompany[c].doubleCert,
+            }))} xKey="name"
+              series={[
+                { key: '总人数', name: '总人数', color: '#e82127' },
+                { key: '持证', name: '持证', color: '#0066cc' },
+                { key: '双证', name: '双证', color: '#6e3ff3' },
+              ]}
+              height={220} />
+          </div>
+        </div>
+        <div className="kpi-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 16 }}>
+          {COMPANIES.map(c => (
+            <div key={c} style={{ padding: 14, background: 'var(--bg-elevated)', borderRadius: 10, border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', background: COMPANY_COLORS[c] }}></div>
+                <div style={{ fontSize: 13, color: 'var(--text-0)', fontWeight: 600 }}>{c}</div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-2)' }}>
+                <span>人数 {stats.byCompany[c].total}</span>
+                <span>占比 {fmtPct(stats.byCompany[c].total / Math.max(1, t.total))}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-2)', marginTop: 4 }}>
+                <span>覆盖门店 {stats.byCompany[c].storeCount}</span>
+                <span>持证率 {fmtPct(stats.byCompany[c].secCert / Math.max(1, stats.byCompany[c].total))}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 门店人员分布 — 卡片网格版 */}
+      <div className="section" style={{ marginBottom: 16 }}>
+        <div className="section-title">门店人员分布 <span className="badge">{storeList.length} 家门店</span></div>
+        {storeList.length === 0 ? <EmptyState /> : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
+            {storeList.map(s => <StoreCard key={s.name} store={s} onClick={() => setOpenStore(s)} />)}
+          </div>
+        )}
+      </div>
+
+      {/* 趋势分析 */}
+      <div className="section" style={{ marginBottom: 16 }}>
+        <div className="section-title">趋势分析 <span className="badge">所有月份</span></div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div>
+            <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 8 }}>助力销售月度趋势</div>
+            {salesTrend.length > 0 ? <LineTrend data={salesTrend} xKey="month" yKey="value" color="#0066cc" height={180} /> : <EmptyState />}
+          </div>
+          <div>
+            <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 8 }}>亮点事件月度趋势</div>
+            {eventTrend.length > 0 ? <LineTrend data={eventTrend} xKey="month" yKey="value" color="#6e3ff3" height={180} /> : <EmptyState />}
+          </div>
+        </div>
+      </div>
+
+      {/* 月度对比 / 例外项 */}
+      <div className="section" style={{ marginBottom: 16 }}>
+        <div className="section-title">月度对比 · 例外项 <span className="badge">本月 vs 月初（来自周报）</span></div>
+        <MonthlyDiff weeks={stats.weekly ? stats.weekly.weeks : []} selectedMonth={selectedMonth} />
+      </div>
+
+      <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-3)', marginTop: 24, padding: 16, borderTop: '1px solid var(--border)' }}>
+        华中区特斯拉项目安保管理面板 · Powered by MiniMax · 数据来源：安保信息汇总表
+      </div>
+      {openStore && <StoreDetailModal store={openStore} onClose={() => setOpenStore(null)} />}
+    </div>
+  );
+}
+
+function LoginPage({ onLogin }) {
+  const [u, setU] = useState('');
+  const [p, setP] = useState('');
+  const [err, setErr] = useState('');
+  const submit = (e) => {
+    e.preventDefault();
+    if (u.trim() === 'admin' && p === 'admin') {
+      sessionStorage.setItem('tesla_dashboard_authed', '1');
+      onLogin();
+    } else {
+      setErr('用户名或密码错误');
+    }
+  };
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #fafafa 0%, #f0f0f3 100%)' }}>
+      <form onSubmit={submit} style={{ width: 360, background: 'white', border: '1px solid var(--border)', borderRadius: 16, padding: 36, boxShadow: 'var(--shadow-lg)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 8, background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700, color: 'white' }}>T</div>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-0)' }}>华中区特斯拉项目</div>
+            <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 2 }}>安保管理面板 · 授权登录</div>
+          </div>
+        </div>
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 6 }}>用户名</div>
+          <input className="search" style={{ width: '100%', padding: '10px 12px' }} value={u} onChange={(e) => setU(e.target.value)} autoFocus placeholder="请输入用户名" />
+        </div>
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 6 }}>密码</div>
+          <input className="search" type="password" style={{ width: '100%', padding: '10px 12px' }} value={p} onChange={(e) => setP(e.target.value)} placeholder="请输入密码" />
+        </div>
+        {err && <div style={{ fontSize: 12, color: 'var(--accent)', marginBottom: 12 }}>{err}</div>}
+        <button className="btn btn-primary" type="submit" style={{ width: '100%', justifyContent: 'center', padding: '10px 14px', fontSize: 14 }}>登 录</button>
+        <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 16, textAlign: 'center' }}>仅供授权人员访问 · 数据包含员工个人信息</div>
+      </form>
+    </div>
+  );
+}
+
+// 生成云端版 HTML：把当前 sheets 嵌进 __DATA__，让下载下来的文件自带数据、不依赖 localStorage
+function buildCloudHtml(sheets, source) {
+  const html = document.documentElement.outerHTML;
+  const meta = { source: source || '云端版', companies: ['道威', '瑞慕', '赛夫'], generated_at: new Date().toISOString() };
+  const newData = JSON.stringify({ meta, sheets });
+  // 替换 INITIAL_DATA 来源的 __DATA__ 内容
+  return html.replace(
+    /(<div id="__DATA__"[^>]*>)([\s\S]*?)(<\/div>)/,
+    (m, open, _old, close) => open + newData + close
+  );
+}
+
+function downloadCloudHtml(sheets, source) {
+  const html = buildCloudHtml(sheets, source);
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `dashboard_cloud_${ts}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function App() {
+  const [authed, setAuthed] = useState(() => sessionStorage.getItem('tesla_dashboard_authed') === '1');
+  const [sheets, setSheets] = useState(INITIAL_DATA.sheets);
+  const [page, setPage] = useState('home');
+  const [dataSource, setDataSource] = useState('内置示例数据');
+  const [showIntro, setShowIntro] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const fileInput = useRef(null);
+
+  const availableMonths = useMemo(() => detectAvailableMonths(sheets), [sheets]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('tesla_dashboard_data');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.sheets) {
+          setSheets(parsed.sheets);
+          setDataSource(parsed.source || '已上传数据');
+        }
+      } catch (e) { console.warn('Failed to load stored data', e); }
+    }
+    const seen = localStorage.getItem('tesla_dashboard_seen');
+    if (!seen) setShowIntro(true);
+  }, []);
+
+  useEffect(() => {
+    if (availableMonths.length > 0 && !selectedMonth) {
+      setSelectedMonth(availableMonths[availableMonths.length - 1]);
+    }
+  }, [availableMonths, selectedMonth]);
+
+  const dismissIntro = () => {
+    localStorage.setItem('tesla_dashboard_seen', '1');
+    setShowIntro(false);
+  };
+
+  const stats = useMemo(() => {
+    if (!selectedMonth) return aggregate(sheets, 'all');
+    return aggregate(sheets, selectedMonth);
+  }, [sheets, selectedMonth]);
+
+  const handleFile = async (file) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data, { type: 'array', cellDates: false });
+        let newSheets = parseWorkbook(wb);
+        // 提取周报里的现场图片
+        newSheets = await extractWeeklyImages(e.target.result.slice(0), newSheets);
+        setSheets(newSheets);
+        const payload = {
+          sheets: newSheets,
+          source: file.name,
+          uploadedAt: new Date().toISOString(),
+        };
+        try { localStorage.setItem('tesla_dashboard_data', JSON.stringify(payload)); } catch (le) { console.warn('localStorage 存储失败（数据可能含图过大）：', le); }
+        setDataSource(file.name);
+        setSelectedMonth(null);
+        const imgCount = (newSheets.weekly && newSheets.weekly.allImages || []).length;
+        alert(`✅ 已加载 ${file.name}\n\n` +
+              `· 公司汇总：${(newSheets.company_summary || []).length} 行\n` +
+              `· 花名册：${(newSheets.roster || []).length} 人\n` +
+              `· 销售助力：${(newSheets.sales || []).length} 单\n` +
+              `· 亮点事件：${(newSheets.events || []).length} 条\n` +
+              `· 周报：${(newSheets.weekly && newSheets.weekly.weeks || []).length} 周${imgCount ? ' · 含 ' + imgCount + ' 张现场图' : ''}`);
+      } catch (err) {
+        alert('❌ 解析失败: ' + err.message);
+        console.error(err);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const resetData = () => {
+    if (!confirm('确认恢复为内置示例数据？已上传的数据将被清除。')) return;
+    localStorage.removeItem('tesla_dashboard_data');
+    setSheets(INITIAL_DATA.sheets);
+    setDataSource('内置示例数据');
+    setSelectedMonth(null);
+  };
+
+  const topBar = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <MonthSelector months={availableMonths} selected={selectedMonth || ''} onChange={setSelectedMonth} />
+      <div style={{ width: 1, height: 20, background: 'var(--border)' }}></div>
+      <div style={{ fontSize: 11, color: 'var(--text-2)', marginRight: 4 }}>
+        数据源：<span style={{ color: 'var(--text-0)' }}>{dataSource}</span>
+      </div>
+      <button className="btn" onClick={() => setShowIntro(true)} title="使用说明">?</button>
+      <button className="btn" onClick={() => fileInput.current.click()} title="上传新 Excel 自动刷新">📁 上传 Excel</button>
+      <button className="btn" onClick={() => downloadCloudHtml(sheets, dataSource)} title="把当前数据打包成云端版 HTML（用于部署到腾讯云 Webify）">☁ 生成云端版</button>
+      {dataSource !== '内置示例数据' && (
+        <button className="btn" onClick={resetData} title="恢复内置数据">↺ 重置</button>
+      )}
+      <button className="btn" onClick={() => setPage('roster')} title="查看花名册 (敏感)">👥 花名册</button>
+      <button className="btn" onClick={() => { sessionStorage.removeItem('tesla_dashboard_authed'); setAuthed(false); }} title="退出登录">↩ 退出</button>
+    </div>
+  );
+
+  let content;
+  if (page === 'home') content = <Dashboard stats={stats} sheets={sheets} onNavigate={setPage} headerExtra={topBar} selectedMonth={selectedMonth} availableMonths={availableMonths} />;
+  else if (page === 'complaints') content = <ComplaintsPage stats={stats} onBack={() => setPage('home')} headerExtra={topBar} />;
+  else if (page === 'sales') content = <SalesPage stats={stats} onBack={() => setPage('home')} headerExtra={topBar} selectedMonth={selectedMonth} />;
+  else if (page === 'events') content = <EventsPage stats={stats} onBack={() => setPage('home')} headerExtra={topBar} selectedMonth={selectedMonth} />;
+  else if (page === 'roster') content = <RosterPage stats={stats} sheets={sheets} onBack={() => setPage('home')} headerExtra={topBar} />;
+  else if (page === 'weekly') content = <WeeklyPage sheets={sheets} onBack={() => setPage('home')} headerExtra={topBar} selectedMonth={selectedMonth} />;
+
+  if (!authed) return <LoginPage onLogin={() => setAuthed(true)} />;
+
+  return (
+    <>
+      <input ref={fileInput} type="file" accept=".xlsx,.xls" style={{ display: 'none' }}
+        onChange={(e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ''; }} />
+      {showIntro && (
+        <div className="modal-overlay" onClick={dismissIntro}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 520, padding: 0 }}>
+            <div style={{ padding: '24px 28px 16px', borderBottom: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 700, color: 'white' }}>T</div>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: 18, color: 'var(--text-0)' }}>华中区特斯拉项目 · 安保管理面板</h2>
+                  <div style={{ fontSize: 11, color: 'var(--text-2)', marginTop: 2 }}>区域管理人员视图 · 仅供授权人员查看</div>
+                </div>
+              </div>
+            </div>
+            <div style={{ padding: '20px 28px', fontSize: 13, color: 'var(--text-1)', lineHeight: 1.7 }}>
+              <p style={{ margin: '0 0 14px' }}>
+                本系统自动解析 <strong>《华中区安保管理信息汇总》</strong> Excel 文件中的多个工作表，
+                实时生成可视化管理面板。
+              </p>
+              <div style={{ background: 'var(--bg-elevated)', borderRadius: 8, padding: 14, marginBottom: 12, border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 8, fontWeight: 600 }}>主要功能</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, fontSize: 12 }}>
+                  <div>· 人员 / 持证 / 双证实时统计</div>
+                  <div>· 三家保安公司占比分析</div>
+                  <div>· 各门店人员与持证率</div>
+                  <div>· 月度趋势</div>
+                  <div>· 客诉 / 销售 / 亮点详情</div>
+                  <div>· 月份切换 + 上传 Excel</div>
+                </div>
+              </div>
+              <p style={{ margin: 0, fontSize: 12, color: 'var(--text-2)' }}>
+                👉 顶部 <strong>「月份」</strong> 下拉可切换不同月份的数据
+                （销售/事件按月聚合，人员/公司统计为当月快照）。
+              </p>
+            </div>
+            <div style={{ padding: '14px 28px 22px', display: 'flex', justifyContent: 'flex-end' }}>
+              <button className="btn btn-primary" onClick={dismissIntro}>开始使用</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {content}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
